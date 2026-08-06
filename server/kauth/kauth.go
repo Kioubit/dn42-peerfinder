@@ -11,7 +11,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"peerfinder-db/config"
+	"peerfinder/config"
 	"time"
 )
 

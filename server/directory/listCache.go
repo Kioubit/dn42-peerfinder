@@ -9,9 +9,9 @@ import (
 	"maps"
 	"math/rand/v2"
 	"path/filepath"
-	"peerfinder-db/directory/directoryTypes"
-	"peerfinder-db/directory/geomap"
-	"peerfinder-db/directory/interner"
+	"peerfinder/directory/directoryTypes"
+	"peerfinder/directory/geomap"
+	"peerfinder/directory/interner"
 	"slices"
 	"sort"
 	"strconv"
@@ -19,7 +19,7 @@ import (
 	"sync"
 	"time"
 
-	"peerfinder-db/config"
+	"peerfinder/config"
 )
 
 // listCacheTTL controls how often the in-memory network index is refreshed from

@@ -5,10 +5,10 @@ import (
 	"encoding/json"
 )
 
-//go:embed data-assets/locodes.json
+//go:embed data-assets/generated/locodes.json
 var loCodesJSON []byte
 
-//go:embed data-assets/countries.geo.json
+//go:embed data-assets/generated/countries.geo.json
 var countriesGeoJSON []byte
 
 type LoCodeBuilder struct {

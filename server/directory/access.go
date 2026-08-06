@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"peerfinder-db/directory/directoryTypes"
+	"peerfinder/directory/directoryTypes"
 	"time"
 
 	"github.com/goccy/go-yaml"

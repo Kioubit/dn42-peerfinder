@@ -11,9 +11,9 @@ import (
 	"math/rand/v2"
 	"net/http"
 	"net/netip"
-	"peerfinder-db/config"
-	"peerfinder-db/directory/directoryTypes"
-	"peerfinder-db/kauth"
+	"peerfinder/config"
+	"peerfinder/directory/directoryTypes"
+	"peerfinder/kauth"
 	"sync"
 	"time"
 )

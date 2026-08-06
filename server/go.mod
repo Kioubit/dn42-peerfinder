@@ -1,4 +1,4 @@
-module peerfinder-db
+module peerfinder
 
 go 1.26
 

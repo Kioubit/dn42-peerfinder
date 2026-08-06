@@ -10,9 +10,9 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"peerfinder-db/config"
-	"peerfinder-db/directory/directoryTypes"
-	"peerfinder-db/kauth"
+	"peerfinder/config"
+	"peerfinder/directory/directoryTypes"
+	"peerfinder/kauth"
 	"strconv"
 	"strings"
 )

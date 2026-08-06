@@ -2,7 +2,7 @@ package geomap
 
 import (
 	"encoding/json"
-	"peerfinder-db/directory/directoryTypes"
+	"peerfinder/directory/directoryTypes"
 	"sort"
 	"strings"
 )
