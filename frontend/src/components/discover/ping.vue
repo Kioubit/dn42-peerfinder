@@ -10,7 +10,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
 import NetworkDialog from "../list/NetworkDialog.vue";
-import {useAuth} from "@/composables/useAuth";
+import {useAuth} from "@/composables/useAuth.ts";
 import {
   isPingErrorResponse, isPingMeta,
   isPingResult,

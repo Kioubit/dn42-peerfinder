@@ -15,7 +15,7 @@ import {
   faTags, faEdit, faArrowUp, faArrowDown, faGripLines, faUserPlus, faInfoCircle,
   faTrashAlt, faTimes
 } from '@fortawesome/free-solid-svg-icons'
-import {useAuth} from "@/composables/useAuth";
+import {useAuth} from "@/composables/useAuth.ts";
 import {knownTags, isNetwork, type Network, type Server, type Tag} from "@/types/api/directory.ts";
 import * as flagIconsRaw from 'country-flag-icons/string/3x2'
 const flagIcons = flagIconsRaw as Record<string, string>

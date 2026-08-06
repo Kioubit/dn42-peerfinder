@@ -1,6 +1,6 @@
 import {computed, ref} from "vue";
 
-const authToken = ref("");
+const authToken = ref<string>("");
 
 export function useAuth() {
     return {
@@ -11,7 +11,7 @@ export function useAuth() {
     }
 }
 
-function setToken(newToken) {
+function setToken(newToken: string) {
     authToken.value = newToken;
 }
 

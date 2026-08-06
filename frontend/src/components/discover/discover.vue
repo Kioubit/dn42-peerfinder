@@ -8,7 +8,7 @@ import {
   faCircle, faChartLine, faEyeSlash, faEye, faVial
 } from "@fortawesome/free-solid-svg-icons";
 import Ping from "./ping.vue";
-import {useAuth} from "@/composables/useAuth";
+import {useAuth} from "@/composables/useAuth.ts";
 import {
   type AgentInfo,
   type AgentStatistics, type EditAgentPayload,
