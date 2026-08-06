@@ -1,0 +1,27 @@
+[Unit]
+Description=DN42 Peer Finder Measurement Agent
+Documentation=https://peerfinder.dn42.dev
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=python3 /usr/local/bin/peerfinder-agent.py
+Restart=always
+RestartSec=300s
+
+# Set the secret key here or via a systemd service override
+#Environment="SECRET_KEY=<Your secret key>"
+
+# Hardening
+DynamicUser=yes
+ProtectSystem=strict
+NoNewPrivileges=yes
+RestrictAddressFamilies=AF_INET AF_INET6
+AmbientCapabilities=CAP_NET_RAW
+CapabilityBoundingSet=CAP_NET_RAW
+SystemCallArchitectures=native
+MemoryDenyWriteExecute=true
+TasksMax=20
+
+[Install]
+WantedBy=multi-user.target

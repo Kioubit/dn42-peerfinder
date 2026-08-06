@@ -1,0 +1,29 @@
+{
+  "name": "peerfinder-frontend",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc --build && vite build",
+    "preview": "vite preview",
+    "build-only": "vite build",
+    "type-check": "vue-tsc --build"
+  },
+  "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "7.3.1",
+    "@fortawesome/free-solid-svg-icons": "7.3.1",
+    "@fortawesome/vue-fontawesome": "3.3.3",
+    "bootstrap": "5.3.8",
+    "country-flag-icons": "1.6.20",
+    "ol": "10.10.0",
+    "vue": "3.5.41"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "6.0.8",
+    "vite": "8.2.0",
+    "typescript": "6.0.3",
+    "vue-tsc": "3.3.9",
+    "@vue/tsconfig": "0.9.1"
+  }
+}

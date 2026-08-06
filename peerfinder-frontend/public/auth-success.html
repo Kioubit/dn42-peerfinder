@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Authentication</title>
+</head>
+<body>
+<script>
+    (function processAuth() {
+        const showError = () => {
+            document.body.innerHTML = '<p>An error occurred. Please try using a different browser.</p>';
+        };
+
+        try {
+            if (!window.opener) {
+                showError();
+                return;
+            }
+
+            const token = window.location.search.slice(1);
+            if (token) {
+                window.opener.postMessage(
+                    { type: 'AUTH_SUCCESS', token: token },
+                    window.location.origin
+                );
+                document.body.innerHTML = '<p>Authentication completed. You can close this window.</p>';
+                window.close();
+            } else {
+                window.opener.postMessage({ type: 'AUTH_ERROR' }, window.location.origin);
+                showError();
+            }
+
+        } catch (e) {
+            console.error(e);
+            showError();
+        }
+    })();
+</script>
+</body>
+</html>

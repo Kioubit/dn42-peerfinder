@@ -1,0 +1,8 @@
+body {
+  overflow-y: scroll;
+}
+
+.flag-svg {
+  display: inline-block;
+  width: 1.2em;
+}
