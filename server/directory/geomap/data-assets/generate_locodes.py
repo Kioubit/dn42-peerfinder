@@ -83,6 +83,7 @@ def main():
 
             locodes[country + place] = coord
 
+    os.makedirs(os.path.dirname(LOCODES_PATH), exist_ok=True)
     with open(LOCODES_PATH, "w", encoding="utf-8") as f:
         json.dump(locodes, f, ensure_ascii=False, separators=(",", ":"))
 
