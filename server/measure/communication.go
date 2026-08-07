@@ -21,6 +21,11 @@ import (
 	"time"
 )
 
+var (
+	requestMarker  = [1]byte{0x00}
+	responseMarker = [1]byte{0x01}
+)
+
 // sendAgentRequest opens a TCP connection to an agent, sends an HMAC-signed
 // request, and returns the verified JSON response. The agent's shared
 // secret (HMACKey) authenticates both directions.
@@ -59,9 +64,8 @@ func sendAgentRequest(ctx context.Context, peer agentInfo, payload map[string]an
 
 	mac := hmac.New(sha256.New, key)
 
-	var requestMarker = [1]byte{0x00}
 	if peer.Version != nil {
-		// New MAC format
+		// New MAC format for versions >= 1.2.0
 		if cmp, err := compareVersions(*peer.Version, "1.2.0"); err == nil && cmp >= 0 {
 			mac.Write(requestMarker[:])
 		}
@@ -160,7 +164,6 @@ func sendAgentRequest(ctx context.Context, peer agentInfo, payload map[string]an
 	}
 
 	usesLegacyResponseMac := false
-	var responseMarker = [1]byte{0x01}
 
 	mac.Reset()
 	mac.Write(responseMarker[:])
@@ -168,7 +171,8 @@ func sendAgentRequest(ctx context.Context, peer agentInfo, payload map[string]an
 	mac.Write(respNcBuf)
 	mac.Write(respPayload)
 	if !hmac.Equal(respSig, mac.Sum(nil)) {
-		// --- LEGACY (agent version < v1.1.0) ---
+		// return nil, false
+		// --- LEGACY (agent version < v1.2.0) ---
 		mac.Reset()
 		mac.Write(respTsBuf)
 		mac.Write(respNcBuf)
@@ -198,8 +202,12 @@ func sendAgentRequest(ctx context.Context, peer agentInfo, payload map[string]an
 			return nil, false
 		}
 
-		// Disallow legacy MAC for versions >= 1.1.0
-		if cmp, err := compareVersions(versionStr, "1.1.0"); err != nil || cmp >= 0 {
+		if !isValidVersionString(versionStr) {
+			return nil, false
+		}
+
+		// Disallow legacy MAC for versions >= 1.2.0
+		if cmp, err := compareVersions(versionStr, "1.2.0"); err != nil || cmp >= 0 {
 			return nil, false
 		}
 

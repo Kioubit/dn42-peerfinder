@@ -13,7 +13,6 @@ import (
 	"peerfinder/config"
 	"peerfinder/directory"
 	"peerfinder/directory/directoryTypes"
-	"regexp"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -137,7 +136,7 @@ func (s *MeasurementStore) StartCleanupRateLimitWorker() {
 // markSeen refreshes last_seen, last_probed and optionally the client version
 func (s *MeasurementStore) markSeen(peerID, version string) error {
 	var err error
-	if len(version) > 11 || !regexp.MustCompile(`^[0-9.]+$`).MatchString(version) {
+	if !isValidVersionString(version) {
 		version = ""
 	}
 	now := time.Now().Unix()

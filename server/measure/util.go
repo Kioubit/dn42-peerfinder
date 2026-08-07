@@ -7,6 +7,7 @@ import (
 	"log"
 	"math"
 	"net/netip"
+	"regexp"
 	"strings"
 	"unicode"
 )
@@ -83,4 +84,10 @@ func containsWhitespace(s string) bool {
 		}
 	}
 	return false
+}
+
+var validVersionRegexp = regexp.MustCompile(`^\d{1,4}\.\d{1,4}\.\d{1,4}$`)
+
+func isValidVersionString(s string) bool {
+	return validVersionRegexp.MatchString(s)
 }
