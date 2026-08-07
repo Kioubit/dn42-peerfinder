@@ -1,22 +1,31 @@
 #!/bin/sh
-set -e
+set -eu
+
+exec 9>access.lock
+flock 9
 
 cd node-directory/
 
-# Fetch latest changes from remote
-git fetch origin
+# Abort any previous failed rebase
+[ -d ".git/rebase-merge" ] && git rebase --abort
 
-# Stage all local changes
-git add .
+# Stage all changes
+git add -A
 
-# Commit local changes (don't fail if nothing to commit)
-git commit -m "Auto-sync: $(date '+%Y-%m-%d %H:%M:%S')" || true
+# Commit if there are local changes
+if ! git diff --cached --quiet; then
+    git commit -m "Auto-sync: $(date '+%Y-%m-%d %H:%M:%S')"
+fi
 
-# Pull with rebase to maintain local priority
-git pull --rebase origin main
+# Fetch and rebase (forcing local changes to win conflicts)
+git fetch origin main
+git rebase -X theirs origin/main
 
-# Push synchronized changes to remote
-git push origin main
-
-echo "Git sync completed successfully"
+# Push (retry once if push fails due to network/race)
+git push origin main || {
+    echo "First push failed. Retrying after fetch..."
+    git fetch origin main
+    git rebase -X theirs origin/main
+    git push origin main
+}
 
