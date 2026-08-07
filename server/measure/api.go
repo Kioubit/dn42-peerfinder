@@ -181,7 +181,7 @@ func (s *MeasurementStore) PingStreamHandler(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	rows, err := s.db.QueryContext(ctx, "SELECT uuid, asn, id, endpoint, hmac_key FROM peers WHERE endpoint != '' AND disabled = 0")
+	rows, err := s.db.QueryContext(ctx, "SELECT uuid, asn, id, endpoint, hmac_key, version FROM peers WHERE endpoint != '' AND disabled = 0")
 	if err != nil {
 		log.Println("database query error:", err)
 		sendError("database error")
@@ -190,7 +190,7 @@ func (s *MeasurementStore) PingStreamHandler(w http.ResponseWriter, r *http.Requ
 	var agents []agentInfo
 	for rows.Next() {
 		var peer agentInfo
-		if err := rows.Scan(&peer.UUID, &peer.ASN, &peer.ID, &peer.Endpoint, &peer.HMACKey); err != nil {
+		if err := rows.Scan(&peer.UUID, &peer.ASN, &peer.ID, &peer.Endpoint, &peer.HMACKey, &peer.Version); err != nil {
 			log.Println("measurement: streaming scan failed:", err)
 			break
 		}
@@ -299,11 +299,11 @@ func (s *MeasurementStore) TestAgentHandler(w http.ResponseWriter, r *http.Reque
 		http.Error(w, "uuid query parameter is required", http.StatusBadRequest)
 		return
 	}
-	row := s.db.QueryRow(`SELECT uuid, asn, id, endpoint, hmac_key FROM peers
+	row := s.db.QueryRow(`SELECT uuid, asn, id, endpoint, hmac_key, version FROM peers
                                          WHERE endpoint != '' AND uuid = ? AND asn = ?`, uuid, session.ASN)
 
 	var peer agentInfo
-	if err := row.Scan(&peer.UUID, &peer.ASN, &peer.ID, &peer.Endpoint, &peer.HMACKey); err != nil {
+	if err := row.Scan(&peer.UUID, &peer.ASN, &peer.ID, &peer.Endpoint, &peer.HMACKey, &peer.Version); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			http.Error(w, "agent not found", http.StatusNotFound)
 			return

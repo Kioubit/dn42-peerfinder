@@ -58,6 +58,14 @@ func sendAgentRequest(ctx context.Context, peer agentInfo, payload map[string]an
 	}
 
 	mac := hmac.New(sha256.New, key)
+
+	var requestMarker = [1]byte{0x00}
+	if peer.Version != nil {
+		// New MAC format
+		if cmp, err := compareVersions(*peer.Version, "1.2.0"); err == nil && cmp >= 0 {
+			mac.Write(requestMarker[:])
+		}
+	}
 	mac.Write(tsBuf)
 	mac.Write(ncBuf)
 	mac.Write(body)

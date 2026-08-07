@@ -51,7 +51,7 @@ function addAgentMetadata(agent: AgentInfo): AgentWithMetadata {
   };
 }
 
-const AGENT_VERSION = "1.1.0";
+const AGENT_VERSION = "1.2.0";
 
 const {authToken, isLoggedIn} = useAuth();
 

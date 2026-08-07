@@ -9,7 +9,7 @@
 //    2 bytes  Body length
 //    N bytes  JSON body
 //
-//   MAC_input (request)  = ts || nonce || body
+//   MAC_input (request)  = 0x00 || ts || nonce || body
 //   MAC_input (response) = 0x01 || ts || nonce || body
 //
 // Note: Verifpal cannot model the NonceCache and the timestamp-skew window.
@@ -19,20 +19,23 @@ attacker[active]
 
 principal Peerfinder[
     knows private key          // shared HMAC secret from registration
+    knows public dir_req       // public constant: 0x00
     knows public dir_resp      // public constant: 0x01
     generates ts
     generates nonce
     generates body             // opaque request payload
-    sig_req = MAC(key, CONCAT(ts, nonce, body))
+    // Request MAC is direction-bound
+    sig_req = MAC(key, CONCAT(dir_req, ts, nonce, body))
 ]
 
 Peerfinder -> Agent: sig_req, ts, nonce, body
 
 principal Agent[
     knows private key
+    knows public dir_req
     knows public dir_resp
 
-    sig_req_valid = ASSERT(sig_req, MAC(key, CONCAT(ts, nonce, body)))?
+    sig_req_valid = ASSERT(sig_req, MAC(key, CONCAT(dir_req, ts, nonce, body)))?
 
     generates resp_body // Command execution result
     // Response MAC is direction-bound

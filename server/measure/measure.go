@@ -257,7 +257,7 @@ func (s *MeasurementStore) agentHealthCheck() bool {
 	defer cancel()
 
 	cutoff := time.Now().Add(-agentHealthCheckInterval).Unix()
-	rows, err := s.db.Query(`SELECT uuid, asn, id, endpoint, hmac_key
+	rows, err := s.db.Query(`SELECT uuid, asn, id, endpoint, hmac_key, version
 		FROM peers WHERE endpoint != '' AND (last_probed < ? OR last_probed IS NULL) AND disabled = 0`, cutoff)
 	if err != nil {
 		log.Println("measurement: health check select failed:", err)
@@ -267,7 +267,7 @@ func (s *MeasurementStore) agentHealthCheck() bool {
 	var agents []agentInfo
 	for rows.Next() {
 		var peer agentInfo
-		if err := rows.Scan(&peer.UUID, &peer.ASN, &peer.ID, &peer.Endpoint, &peer.HMACKey); err != nil {
+		if err := rows.Scan(&peer.UUID, &peer.ASN, &peer.ID, &peer.Endpoint, &peer.HMACKey, &peer.Version); err != nil {
 			log.Println("measurement: health check scan failed:", err)
 			continue
 		}

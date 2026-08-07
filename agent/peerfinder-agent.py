@@ -34,7 +34,7 @@ LISTEN_HOST, LISTEN_PORT = "::", int(os.environ.get("LISTEN_PORT", "9000"))
 LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO").upper()
 
 # --- Constants ---
-AGENT_VERSION = "1.1.0"
+AGENT_VERSION = "1.2.0"
 NB_PINGS = 4
 MAX_TIMESTAMP_SKEW = 30
 CONN_TIMEOUT = 15
@@ -95,10 +95,12 @@ class NonceCache:
 nonce_cache = NonceCache(MAX_TIMESTAMP_SKEW)
 
 
-def sign(ts_buf: bytes, nonce_buf: bytes, body: bytes, response: bool = False) -> bytes:
+def sign(ts_buf: bytes, nonce_buf: bytes, body: bytes, response: bool = False, legacy: bool = False) -> bytes:
     mac = hmac.new(HMAC_KEY, digestmod=hashlib.sha256)
     if response:
         mac.update(b"\x01")
+    elif not legacy:
+        mac.update(b"\x00")
     for part in (ts_buf, nonce_buf, body):
         mac.update(part)
     return mac.digest()
@@ -207,7 +209,7 @@ def handle_connection(conn, addr):
     #
     # Binary wire format (big-endian), used for both requests and responses:
     #
-    #   32 bytes  HMAC-SHA256( [response-marker] || timestamp || nonce || body)
+    #   32 bytes  HMAC-SHA256( marker || timestamp || nonce || body)
     #    8 bytes  Unix timestamp (uint64)
     #   32 bytes  Nonce
     #    2 bytes  Body length N (uint16)
@@ -227,7 +229,11 @@ def handle_connection(conn, addr):
 
         expected_sig = sign(ts_buf, nonce_buf, body)
         if not hmac.compare_digest(expected_sig, sig):
-            return
+            # Transition period
+            if not hmac.compare_digest(sign(ts_buf, nonce_buf, body, legacy=True), sig):
+                return
+            else:
+                logger.debug("accepted legacy mac")
 
         req_ts = int.from_bytes(ts_buf, "big")
         if abs(time.time() - req_ts) > MAX_TIMESTAMP_SKEW:
