@@ -1,0 +1,58 @@
+// =====================================================================
+// dn42 Peer Finder measurement - Verifpal model (v0.80.0)
+//
+// Wire format (big-endian):
+//
+//   32 bytes  HMAC-SHA256(key, MAC_input)
+//    8 bytes  Unix timestamp
+//   32 bytes  Nonce
+//    2 bytes  Body length
+//    N bytes  JSON body
+//
+//   MAC_input (request)  = ts || nonce || body
+//   MAC_input (response) = 0x01 || ts || nonce || body
+//
+// Note: Verifpal cannot model the NonceCache and the timestamp-skew window.
+// =====================================================================
+
+attacker[active]
+
+principal Peerfinder[
+    knows private key          // shared HMAC secret from registration
+    knows public dir_resp      // public constant: 0x01
+    generates ts
+    generates nonce
+    generates body             // opaque request payload
+    sig_req = MAC(key, CONCAT(ts, nonce, body))
+]
+
+Peerfinder -> Agent: sig_req, ts, nonce, body
+
+principal Agent[
+    knows private key
+    knows public dir_resp
+
+    sig_req_valid = ASSERT(sig_req, MAC(key, CONCAT(ts, nonce, body)))?
+
+    generates resp_body // Command execution result
+    // Response MAC is direction-bound
+    sig_resp = MAC(key, CONCAT(dir_resp, ts, nonce, resp_body))
+]
+
+Agent -> Peerfinder: sig_resp, resp_body
+
+principal Peerfinder[
+    // Response verification expects the direction byte
+    sig_resp_valid = ASSERT(sig_resp, MAC(key, CONCAT(dir_resp, ts, nonce, resp_body)))?
+]
+
+queries[
+    // Key is confidential
+    confidentiality? key
+    // Request is authenticated
+    authentication? Peerfinder -> Agent: body
+    // Response is authenticated
+    authentication? Agent -> Peerfinder: resp_body
+    // Nonce is freshly generated
+    freshness? nonce
+]
