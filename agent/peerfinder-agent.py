@@ -34,7 +34,7 @@ LISTEN_HOST, LISTEN_PORT = "::", int(os.environ.get("LISTEN_PORT", "9000"))
 LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO").upper()
 
 # --- Constants ---
-AGENT_VERSION = "1.0.6"
+AGENT_VERSION = "1.1.0"
 NB_PINGS = 4
 MAX_TIMESTAMP_SKEW = 30
 CONN_TIMEOUT = 15
@@ -95,8 +95,10 @@ class NonceCache:
 nonce_cache = NonceCache(MAX_TIMESTAMP_SKEW)
 
 
-def sign(ts_buf: bytes, nonce_buf: bytes, body: bytes) -> bytes:
+def sign(ts_buf: bytes, nonce_buf: bytes, body: bytes, response: bool = False) -> bytes:
     mac = hmac.new(HMAC_KEY, digestmod=hashlib.sha256)
+    if response:
+        mac.update(b"\x01")
     for part in (ts_buf, nonce_buf, body):
         mac.update(part)
     return mac.digest()
@@ -186,6 +188,16 @@ def parse_ping_output(output) -> PingResult:
 
     return res
 
+def self_test() -> bool:
+    logger.info("Running self-test")
+    for ip in ("127.0.0.1", "::1"):
+        res = run_ping(ip)
+        if res["reachable"] and res["latency"] is not None and res["recv"] == NB_PINGS:
+            logger.info("Self-test OK (%s): %s", ip, res)
+            return True
+        logger.warning("Self-test via %s failed: %s", ip, res)
+    logger.error("Self-test FAILED (ping binary missing or lacking ICMP permission?)")
+    return False
 
 def handle_connection(conn, addr):
     # Communication
@@ -195,15 +207,14 @@ def handle_connection(conn, addr):
     #
     # Binary wire format (big-endian), used for both requests and responses:
     #
-    #   32 bytes  HMAC-SHA256(timestamp || nonce || body)
+    #   32 bytes  HMAC-SHA256( [response-marker] || timestamp || nonce || body)
     #    8 bytes  Unix timestamp (uint64)
     #   32 bytes  Nonce
     #    2 bytes  Body length N (uint16)
     #    N bytes  JSON body
     #
-    # Responses must echo the request timestamp and nonce exactly (request binding) and must never
-    # include a JSON key with the name "command" (request vs response domain separation).
-    # Both "version" and "ping" commands are used by the backend.
+    # Responses must echo the request timestamp and nonce exactly (request binding).
+    # Both "version" and "ping" commands are used by the backend and must be supported.
     try:
         deadline = time.monotonic() + AUTH_DEADLINE
 
@@ -248,7 +259,7 @@ def handle_connection(conn, addr):
         resp_payload = json.dumps(result).encode()
 
         # Echo back the exact request timestamp and nonce
-        resp_sig = sign(ts_buf, nonce_buf, resp_payload)
+        resp_sig = sign(ts_buf, nonce_buf, resp_payload, True)
         header = HEADER.pack(resp_sig, ts_buf, nonce_buf, len(resp_payload))
         conn.sendall(header + resp_payload)
 
@@ -274,6 +285,8 @@ def serve(conn, addr):
 
 
 def main():
+    if not self_test():
+        sys.exit(1)
     # Use dual-stack socket if possible
     srv = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
     srv.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -284,7 +297,7 @@ def main():
 
     srv.bind((LISTEN_HOST, LISTEN_PORT))
     srv.listen(6)
-    logger.info(f"DN42 Peer Finder Agent {AGENT_VERSION} listening on port {LISTEN_PORT}")
+    logger.info(f"DN42 Peer Finder Agent v{AGENT_VERSION} listening on port {LISTEN_PORT}")
 
     with srv, ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
         try:

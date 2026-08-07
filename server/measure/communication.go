@@ -151,12 +151,25 @@ func sendAgentRequest(ctx context.Context, peer agentInfo, payload map[string]an
 		return nil, false
 	}
 
+	usesLegacyResponseMac := false
+	var responseMarker = [1]byte{0x01}
+
 	mac.Reset()
+	mac.Write(responseMarker[:])
 	mac.Write(respTsBuf)
 	mac.Write(respNcBuf)
 	mac.Write(respPayload)
 	if !hmac.Equal(respSig, mac.Sum(nil)) {
-		return nil, false
+		// --- LEGACY (agent version < v1.1.0) ---
+		mac.Reset()
+		mac.Write(respTsBuf)
+		mac.Write(respNcBuf)
+		mac.Write(respPayload)
+		if !hmac.Equal(respSig, mac.Sum(nil)) {
+			return nil, false
+		}
+		usesLegacyResponseMac = true
+		// --------------------------------------
 	}
 
 	if respTs != reqTs {
@@ -171,27 +184,24 @@ func sendAgentRequest(ctx context.Context, peer agentInfo, payload map[string]an
 		return nil, false
 	}
 
-	// Check that command key is not included in versions >= 1.0.4
-	versionRaw, ok := resp["version"]
-	if !ok {
-		// version is required to determine whether "command" is allowed
-		return nil, false
-	}
-
-	versionStr, ok := versionRaw.(string)
-	if !ok {
-		return nil, false
-	}
-
-	cmp, err := compareVersions(versionStr, "1.0.4")
-	if err != nil {
-		return nil, false
-	}
-
-	if cmp >= 0 {
-		if _, exists := resp["command"]; exists {
-			// "command" should have been removed starting from 1.0.4
+	if usesLegacyResponseMac {
+		versionStr, ok := resp["version"].(string)
+		if !ok {
 			return nil, false
+		}
+
+		// Disallow legacy MAC for versions >= 1.1.0
+		if cmp, err := compareVersions(versionStr, "1.1.0"); err != nil || cmp >= 0 {
+			return nil, false
+		}
+
+		// Disallow "command" field for versions >= 1.0.4
+		if cmp, err := compareVersions(versionStr, "1.0.4"); err != nil {
+			return nil, false
+		} else if cmp >= 0 {
+			if _, exists := resp["command"]; exists {
+				return nil, false
+			}
 		}
 	}
 
