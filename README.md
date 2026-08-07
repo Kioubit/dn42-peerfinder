@@ -16,4 +16,4 @@ A directory of [dn42](https://dn42.dev) networks designed to help members discov
 ### Design
 - Frontend: Vue.js + TypeScript
 - Backend: Go + SQLite + YAML
-- Measurement agent: Python (protocol formally verified with Verifpal)
+- Measurement agent: Python (protocol formally verified with [Verifpal](https://github.com/symbolicsoft/verifpal))

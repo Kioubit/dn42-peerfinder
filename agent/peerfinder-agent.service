@@ -10,7 +10,11 @@ Restart=always
 RestartSec=300s
 
 # Set the secret key here or via a systemd service override
-#Environment="SECRET_KEY=<Your secret key>"
+#Environment="SECRET_KEY="
+#Environment="SECRET_KEY_FILE=/path/to/secret.key"
+# Or use systemd credentials
+#LoadCredentialEncrypted=SECRET_KEY_FILE:/etc/credstore.encrypted/secret_key_file.cred
+#Environment="SECRET_KEY_FILE=%d/SECRET_KEY_FILE"
 
 # Hardening
 DynamicUser=yes
