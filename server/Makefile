@@ -1,5 +1,4 @@
 BINARY := peerfinder
-BUILDFLAGS=-trimpath -tags sqlite_omit_load_extension
 DATA_ASSETS := directory/geomap/data-assets
 
 .PHONY: build release clean clean-all data-assets
@@ -13,7 +12,7 @@ build: data-assets
 	go build -o bin/${BINARY} .
 
 release: data-assets
-	go build -ldflags="-s -w -extldflags=-static" ${BUILDFLAGS} -o bin/${BINARY} .
+	go build -ldflags="-s -w -extldflags=-static" -trimpath -tags sqlite_omit_load_extension -o bin/${BINARY} .
 
 clean:
 	rm -rf bin/
