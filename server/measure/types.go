@@ -25,14 +25,14 @@ const maxAgentConcurrency = 64
 // maxMeasurementDuration caps the total measurement duration for a single ping request.
 const maxMeasurementDuration = 4 * time.Minute
 
-// maxHealthCheckDuration caps the total duration of agent health checks
+// maxHealthCheckDuration caps the total duration of agent health checks.
 const maxHealthCheckDuration = 10 * time.Minute
 
 // minHealthyAgents specifies the minimum healthy agents for the health check to be successful.
 const minHealthyAgents = 16
 
-// agentHealthCheckInterval is how often the backend probes every agent with a
-// "version" command to refresh its last-seen timestamp.
+// agentHealthCheckInterval is how often the backend probes agents not probed within this duration
+// with a "version" command to refresh their last_seen timestamp.
 const agentHealthCheckInterval = 24 * time.Hour
 
 // agentMaxDownDuration is how long an agent may go without a successful response

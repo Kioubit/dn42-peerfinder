@@ -1,16 +1,20 @@
-# peerfinder.dn42.dev - DN42 Peer Finder
+# DN42 Peer Finder
 #
 # Targets:
 #   frontend - Build the Vite frontend (npm run build)
 #   www      - Copy frontend/dist/ + agent files into server/www/
 #   server   - Build the Go server (includes data-assets generation)
-#   build    - Default target
+#   build    - Default target for running locally & debug
 #   release  - Build a static release binary via server/Makefile
 #   clean    - Remove all build artifacts
 
-.PHONY: frontend www server build release clean
+.PHONY: frontend www server data-dir build release clean
 
-build: server
+build: server data-dir
+
+data-dir:
+	mkdir -p data/measurements/
+	cd data && ./archive.sh
 
 frontend:
 	cd frontend && npm run build
@@ -31,3 +35,5 @@ clean:
 	$(MAKE) -C server clean
 	rm -rf server/www/
 	rm -rf frontend/dist/
+	rm -rf data/access.lock
+	rm -rf data/archive.zip

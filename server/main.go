@@ -25,13 +25,24 @@ func main() {
 	log.SetFlags(log.Llongfile)
 
 	flag.StringVar(&config.Global.MyDomain, "domain", "peerfinder.dn42.dev", "domain name")
-	flag.BoolVar(&config.Global.IsDevelopment, "development", false, "development mode")
-	flag.StringVar(&config.Global.DataDirectory, "data", "./data/node-directory/servers/", "data directory")
-	flag.StringVar(&config.Global.ZipPath, "zip", "./data/archive.zip", "zip path")
-	flag.StringVar(&config.Global.MeasurementDir, "measurements", "./data/measurements/", "measurement DB store directory")
-	flag.IntVar(&config.Global.MaxOpenRequests, "max-open-requests", 2, "maximum number of concurrently open ping requests")
-	flag.IntVar(&config.Global.MaxAgentsPerASN, "max-agents-per-asn", 80, "maximum number of agents an ASN can register")
+	flag.BoolVar(&config.Global.IsDevelopment, "development", false, "enable development mode")
+	flag.StringVar(&config.Global.ServersDirectory, "servers-dir", "../data/node-directory/servers/",
+		"path to the servers directory of the node-directory containing yml files")
+	flag.StringVar(&config.Global.LocalFinderZipPath, "local-finder-zip-path", "../data/archive.zip",
+		"path to the zip file containing the local finder script")
+	flag.StringVar(&config.Global.MeasurementDir, "measurement-dir", "../data/measurements/",
+		"measurement DB store directory")
+	flag.IntVar(&config.Global.MaxOpenRequests, "max-open-requests", 2,
+		"maximum number of concurrently open ping requests")
+	flag.IntVar(&config.Global.MaxAgentsPerASN, "max-agents-per-asn", 80,
+		"maximum number of agents an ASN can register")
 	flag.Parse()
+
+	for _, p := range []string{config.Global.ServersDirectory, config.Global.LocalFinderZipPath, config.Global.MeasurementDir} {
+		if _, err := os.Stat(p); os.IsNotExist(err) {
+			log.Fatalf("path does not exist: %s", p)
+		}
+	}
 
 	nlc := directory.NewNetworkListCache()
 	// Warm the network list cache

@@ -120,11 +120,11 @@ func (c *ListCache) rebuild() ([]cachedNetwork, []string, string) {
 	seenCountries := make(map[string]struct{})
 	sIn := make(interner.StringInterner)
 
-	_ = filepath.WalkDir(config.Global.DataDirectory, func(_ string, d fs.DirEntry, err error) error {
+	_ = filepath.WalkDir(config.Global.ServersDirectory, func(_ string, d fs.DirEntry, err error) error {
 		if err != nil || d.IsDir() {
 			return nil
 		}
-		nw, modTime, err := ReadYAMLFile(config.Global.DataDirectory, d.Name())
+		nw, modTime, err := ReadYAMLFile(config.Global.ServersDirectory, d.Name())
 		if err != nil {
 			log.Printf("Error reading %s: %v", d.Name(), err)
 			return nil
@@ -182,7 +182,7 @@ func readFullNetwork(asn string) (*directoryTypes.YamlNetwork, time.Time, error)
 		return nil, time.Time{}, errors.New("invalid ASN value")
 	}
 	name := asn + ".yml"
-	return ReadYAMLFile(config.Global.DataDirectory, name)
+	return ReadYAMLFile(config.Global.ServersDirectory, name)
 }
 
 // distinctCountryCodes returns the set of country codes

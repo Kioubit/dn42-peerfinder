@@ -8,6 +8,7 @@ import (
 	"math"
 	"net/netip"
 	"strings"
+	"unicode"
 )
 
 // randomHexSecret returns a random hex encoded secret with the desired length
@@ -73,4 +74,13 @@ func isLocalIP(ip netip.Addr) bool {
 	ip = ip.Unmap()
 	return ip.IsLoopback() || ip.IsLinkLocalUnicast() ||
 		ip.IsLinkLocalMulticast() || ip.IsUnspecified()
+}
+
+func containsWhitespace(s string) bool {
+	for _, r := range s {
+		if unicode.IsSpace(r) {
+			return true
+		}
+	}
+	return false
 }

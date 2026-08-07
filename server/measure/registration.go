@@ -14,7 +14,6 @@ import (
 	"peerfinder/directory/directoryTypes"
 	"strconv"
 	"time"
-	"unicode"
 
 	"github.com/mattn/go-sqlite3"
 )
@@ -241,15 +240,6 @@ func validateAgentEndpoint(endpoint string) error {
 	}
 
 	return nil
-}
-
-func containsWhitespace(s string) bool {
-	for _, r := range s {
-		if unicode.IsSpace(r) {
-			return true
-		}
-	}
-	return false
 }
 
 // agentStatistics returns registration statistics

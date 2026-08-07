@@ -1,0 +1,3 @@
+[submodule "data/node-directory"]
+	path = data/node-directory
+	url = https://git.dn42.dev/dn42/node-directory.git

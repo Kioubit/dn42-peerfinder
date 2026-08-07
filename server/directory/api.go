@@ -221,7 +221,7 @@ func makeListETag(dataETag, search string, tags []string, country string, page, 
 }
 
 func (c *ListCache) DownloadLocalFinderScript(w http.ResponseWriter, r *http.Request) {
-	file, err := os.Open(config.Global.ZipPath)
+	file, err := os.Open(config.Global.LocalFinderZipPath)
 	if err != nil {
 		http.Error(w, "File not found", http.StatusNotFound)
 		return
@@ -239,12 +239,12 @@ func (c *ListCache) DownloadLocalFinderScript(w http.ResponseWriter, r *http.Req
 	w.Header().Set("ETag", c.GetEtag())
 	w.Header().Set("Cache-Control", fmt.Sprintf("public, max-age=%d must-revalidate", 9000))
 	w.Header().Set("Content-Type", "application/zip")
-	w.Header().Set("Content-Disposition", "attachment; filename="+filepath.Base(config.Global.ZipPath))
-	http.ServeContent(w, r, filepath.Base(config.Global.ZipPath), stat.ModTime(), file)
+	w.Header().Set("Content-Disposition", "attachment; filename="+filepath.Base(config.Global.LocalFinderZipPath))
+	http.ServeContent(w, r, filepath.Base(config.Global.LocalFinderZipPath), stat.ModTime(), file)
 }
 
 func GetSelfHandler(w http.ResponseWriter, _ *http.Request, session *kauth.AuthenticationInfo) {
-	d, _, err := ReadYAMLFile(config.Global.DataDirectory, session.ASN+".yml")
+	d, _, err := ReadYAMLFile(config.Global.ServersDirectory, session.ASN+".yml")
 	if err != nil {
 		if errors.Is(err, errYAMLFileNotFound) {
 			d = &directoryTypes.YamlNetwork{}
@@ -270,7 +270,7 @@ func GetSelfHandler(w http.ResponseWriter, _ *http.Request, session *kauth.Authe
 }
 
 func (c *ListCache) DeleteHandler(w http.ResponseWriter, _ *http.Request, session *kauth.AuthenticationInfo) {
-	if err := deleteYAMLFile(config.Global.DataDirectory, session.ASN+".yml"); err != nil {
+	if err := deleteYAMLFile(config.Global.ServersDirectory, session.ASN+".yml"); err != nil {
 		log.Println(err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
@@ -295,7 +295,7 @@ func (c *ListCache) EditHandler(w http.ResponseWriter, r *http.Request, session 
 	}
 
 	// Write YAML file
-	if err := writeYAMLFile(config.Global.DataDirectory, session.ASN+".yml", n); err != nil {
+	if err := writeYAMLFile(config.Global.ServersDirectory, session.ASN+".yml", n); err != nil {
 		log.Println("Failed to write YAML file:", err)
 		http.Error(w, "Failed to write YAML", http.StatusInternalServerError)
 		return

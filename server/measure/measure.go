@@ -28,9 +28,6 @@ func NewMeasurementStore(dir string) (*MeasurementStore, error) {
 	if dir == "" {
 		return nil, fmt.Errorf("measurement directory must be set")
 	}
-	if err := os.MkdirAll(dir, 0o755); err != nil {
-		return nil, fmt.Errorf("failed to create measurement dir: %w", err)
-	}
 
 	dbPath := filepath.Join(dir, "peers.db")
 	// If the database does not exist, create it with 0600 permissions
@@ -336,7 +333,7 @@ func (s *MeasurementStore) disableInactiveAgents() {
 	}
 	rows, err := res.RowsAffected()
 	if err != nil {
-		log.Println("deleteInactiveAgents: deleteInactiveAgents cannot obtain rows affected", err)
+		log.Println("deleteInactiveAgents: cannot obtain rows affected", err)
 		return
 	}
 	if rows > 0 {
@@ -348,7 +345,7 @@ func (s *MeasurementStore) networkMeta(asn string) map[string]any {
 	if asn == "" {
 		return nil
 	}
-	c, _, err := directory.ReadYAMLFile(config.Global.DataDirectory, asn+".yml")
+	c, _, err := directory.ReadYAMLFile(config.Global.ServersDirectory, asn+".yml")
 	if err != nil {
 		return nil
 	}

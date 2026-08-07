@@ -9,13 +9,13 @@ import (
 var Global = config{}
 
 type config struct {
-	IsDevelopment   bool
-	MyDomain        string
-	DataDirectory   string
-	ZipPath         string
-	MeasurementDir  string
-	MaxOpenRequests int
-	MaxAgentsPerASN int
+	IsDevelopment      bool
+	MyDomain           string
+	ServersDirectory   string
+	LocalFinderZipPath string
+	MeasurementDir     string
+	MaxOpenRequests    int
+	MaxAgentsPerASN    int
 }
 
 var StaticEtag = ""
