@@ -66,7 +66,7 @@ func boolToInt(b bool) int {
 	return 0
 }
 
-func isPrivateIP(ip netip.Addr) bool {
+func isPrivateOrLocalIP(ip netip.Addr) bool {
 	ip = ip.Unmap()
 	return ip.IsPrivate() || isLocalIP(ip)
 }
@@ -74,7 +74,7 @@ func isPrivateIP(ip netip.Addr) bool {
 func isLocalIP(ip netip.Addr) bool {
 	ip = ip.Unmap()
 	return ip.IsLoopback() || ip.IsLinkLocalUnicast() ||
-		ip.IsLinkLocalMulticast() || ip.IsUnspecified()
+		ip.IsMulticast() || ip.IsUnspecified()
 }
 
 func containsWhitespace(s string) bool {

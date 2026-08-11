@@ -162,8 +162,8 @@ func (s *MeasurementStore) PingStreamHandler(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	if isPrivateIP(addr) {
-		sendError("private ip address not allowed")
+	if isPrivateOrLocalIP(addr) {
+		sendError("private or local ip addresses not allowed")
 		return
 	}
 

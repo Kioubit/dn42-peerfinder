@@ -124,8 +124,8 @@ func (s *YamlServer) validate() error {
 			if err != nil {
 				return fmt.Errorf("invalid address")
 			}
-			if v6.IsLoopback() {
-				return fmt.Errorf("loopback IPv6 addresses are not permitted")
+			if v6.IsLoopback() || v6.IsUnspecified() || v6.IsMulticast() || v6.IsLinkLocalUnicast() {
+				return fmt.Errorf("IPv6 address type is not permitted")
 			}
 		} else {
 			if !allowedAscii(s.Address, true, true, false, true, []rune{'-', '.'}) {
@@ -137,8 +137,8 @@ func (s *YamlServer) validate() error {
 			}
 
 			if v4, err := netip.ParseAddr(s.Address); err == nil {
-				if v4.IsLoopback() {
-					return fmt.Errorf("loopback IPv4 addresses are not permitted")
+				if v4.IsLoopback() || v4.IsUnspecified() || v4.IsMulticast() || v4.IsLinkLocalUnicast() {
+					return fmt.Errorf("IPv4 address type is not permitted")
 				}
 			}
 		}
