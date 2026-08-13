@@ -84,15 +84,7 @@ type MeasurementStore struct {
 	db                     *sql.DB
 	activeMeasurementCount atomic.Int32
 
-	pingHistory   map[string]pingRate
-	pingHistoryMu sync.Mutex
-
 	statistics agentStatistics
-}
-
-type pingRate struct {
-	tokens float64
-	last   time.Time
 }
 
 type agentStatistics struct {

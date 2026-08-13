@@ -9,7 +9,6 @@ import (
 	"net/netip"
 	"regexp"
 	"strings"
-	"unicode"
 )
 
 // randomHexSecret returns a random hex encoded secret with the desired length
@@ -21,7 +20,7 @@ func randomHexSecret(length int) string {
 	return hex.EncodeToString(b)
 }
 
-// limitDescription limits the description to at most one line and 50 characters
+// limitDescription limits the description to at most one line and 50 Unicode characters
 func limitDescription(s string) string {
 	if before, _, found := strings.Cut(s, "\n"); found {
 		s = before
@@ -66,24 +65,21 @@ func boolToInt(b bool) int {
 	return 0
 }
 
-func isPrivateOrLocalIP(ip netip.Addr) bool {
+// isNotPubliclyRoutable returns true if the address is not publicly routable.
+// allowPrivate allows optionally permitting private IPv4 and IPv6 ranges.
+func isNotPubliclyRoutable(ip netip.Addr, allowPrivate bool) bool {
 	ip = ip.Unmap()
-	return ip.IsPrivate() || isLocalIP(ip)
-}
 
-func isLocalIP(ip netip.Addr) bool {
-	ip = ip.Unmap()
-	return ip.IsLoopback() || ip.IsLinkLocalUnicast() ||
-		ip.IsMulticast() || ip.IsUnspecified()
-}
-
-func containsWhitespace(s string) bool {
-	for _, r := range s {
-		if unicode.IsSpace(r) {
-			return true
-		}
+	if !allowPrivate && ip.IsPrivate() {
+		return true
 	}
-	return false
+
+	return ip.IsLoopback() ||
+		ip.IsLinkLocalUnicast() ||
+		ip.IsLinkLocalMulticast() ||
+		ip.IsMulticast() ||
+		ip.IsUnspecified() ||
+		ip.IsInterfaceLocalMulticast()
 }
 
 var validVersionRegexp = regexp.MustCompile(`^\d{1,4}\.\d{1,4}\.\d{1,4}$`)

@@ -117,6 +117,7 @@ onMounted(() => {
             <button
                 class="btn btn-sm d-inline-flex align-items-center gap-1 btn-outline-secondary"
                 @click="copyText(networkLink, $event, 'btn-success', 'btn-outline-secondary')"
+                :title="networkLink"
             >
               <FontAwesomeIcon :icon="faLink" data-copy-toggle />
               <FontAwesomeIcon :icon="faCheck" data-copy-toggle hidden />

@@ -200,17 +200,16 @@ func validateAgentEndpoint(endpoint string) error {
 		return fmt.Errorf("missing")
 	}
 
-	if containsWhitespace(endpoint) {
-		return fmt.Errorf("must not contain any whitespace")
-	}
-
-	if len(endpoint) > 100 {
+	if len(endpoint) > 150 {
 		return fmt.Errorf("too long")
 	}
 
 	host, port, err := net.SplitHostPort(endpoint)
 	if err != nil {
 		return fmt.Errorf("must be in host:port form")
+	}
+	if host == "" {
+		return fmt.Errorf("missing host")
 	}
 	portInt, err := strconv.Atoi(port)
 	if err != nil {
@@ -220,18 +219,15 @@ func validateAgentEndpoint(endpoint string) error {
 		return fmt.Errorf("invalid port number")
 	}
 
-	if host == "" {
-		return fmt.Errorf("missing host")
-	}
-
 	// is IP
 	if ip, err := netip.ParseAddr(host); err == nil {
-		if isLocalIP(ip) {
+		if isNotPubliclyRoutable(ip, true) {
 			return fmt.Errorf("must be a routable address")
 		}
 		return nil
 	}
 
+	// Validate host: only lowercase letters, digits, '-', and '.' are allowed.
 	for _, c := range host {
 		alnum := 'a' <= c && c <= 'z' || '0' <= c && c <= '9'
 		if !alnum && c != '-' && c != '.' {

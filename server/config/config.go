@@ -9,7 +9,6 @@ import (
 var Global = config{}
 
 type config struct {
-	IsDevelopment      bool
 	MyDomain           string
 	ServersDirectory   string
 	LocalFinderZipPath string

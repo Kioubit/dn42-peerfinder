@@ -25,7 +25,6 @@ func main() {
 	log.SetFlags(log.Llongfile)
 
 	flag.StringVar(&config.Global.MyDomain, "domain", "peerfinder.dn42.dev", "domain name")
-	flag.BoolVar(&config.Global.IsDevelopment, "development", false, "enable development mode")
 	flag.StringVar(&config.Global.ServersDirectory, "servers-dir", "../data/node-directory/servers/",
 		"path to the servers directory of the node-directory containing yml files")
 	flag.StringVar(&config.Global.LocalFinderZipPath, "local-finder-zip-path", "../data/archive.zip",
@@ -71,29 +70,22 @@ func main() {
 		log.Fatalln("Failed to initialize measurement store:", err)
 	}
 	go store.RunAgentHealthChecks()
-	go store.StartCleanupRateLimitWorker()
 
 	mux.HandleFunc("GET /api/agents/statistics", store.AgentStatisticsHandler)
 
 	// Authenticated
-	mux.Handle("GET /api/agents/ping", kauth.WithAuth(store.PingStreamHandler))
+	mux.Handle("GET /api/agents/ping", kauth.WithAuth(store.PingStreamHandler()))
 	mux.Handle("GET /api/agents/self", kauth.WithAuth(rateLimiter.WithRateLimiter(store.ListAgentsHandler, 3*time.Hour, 200)))
 	mux.Handle("POST /api/agents/register", kauth.WithAuth(rateLimiter.WithRateLimiter(store.RegisterAgentHandler, 3*time.Hour, 150)))
 	mux.Handle("DELETE /api/agents/{uuid}", kauth.WithAuth(rateLimiter.WithRateLimiter(store.DeleteAgentHandler, 3*time.Hour, 150)))
 	mux.Handle("POST /api/agents/{uuid}/edit", kauth.WithAuth(rateLimiter.WithRateLimiter(store.EditAgentHandler, 3*time.Hour, 100)))
 	mux.Handle("GET /api/agents/{uuid}/test", kauth.WithAuth(rateLimiter.WithRateLimiter(store.TestAgentHandler, 2*time.Hour, 50)))
 
-	var mainHandler http.Handler = mux
-	if config.Global.IsDevelopment {
-		fmt.Println("Development mode active")
-		mainHandler = corsMiddleware(mainHandler)
-	}
-
 	s1 := &http.Server{
 		Addr:              ":8001",
 		ReadHeaderTimeout: 10 * time.Second,
 		IdleTimeout:       1 * time.Minute,
-		Handler:           mainHandler,
+		Handler:           mux,
 	}
 
 	go func() {
@@ -136,22 +128,4 @@ func staticContentHandler() http.Handler {
 	})
 
 	return withETag
-}
-
-func corsMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Permissive CORS headers
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-		w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
-
-		// Handle preflight requests (OPTIONS method)
-		if r.Method == "OPTIONS" {
-			w.WriteHeader(http.StatusOK)
-			return
-		}
-
-		// Call the next handler
-		next.ServeHTTP(w, r)
-	})
 }

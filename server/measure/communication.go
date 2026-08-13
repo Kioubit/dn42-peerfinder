@@ -84,7 +84,7 @@ func sendAgentRequest(ctx context.Context, peer agentInfo, payload map[string]an
 			if err != nil {
 				host = address
 			}
-			if ip, err := netip.ParseAddr(host); err == nil && isLocalIP(ip) {
+			if ip, err := netip.ParseAddr(host); err == nil && isNotPubliclyRoutable(ip, true) {
 				return fmt.Errorf("connections to local addresses are not allowed")
 			}
 			return nil

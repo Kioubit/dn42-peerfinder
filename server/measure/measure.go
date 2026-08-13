@@ -52,10 +52,7 @@ func NewMeasurementStore(dir string) (*MeasurementStore, error) {
 		return nil, fmt.Errorf("failed to create table schema: %w", err)
 	}
 
-	s := &MeasurementStore{
-		db:          db,
-		pingHistory: make(map[string]pingRate),
-	}
+	s := &MeasurementStore{db: db}
 	return s, nil
 }
 
@@ -65,72 +62,6 @@ func (s *MeasurementStore) Close() error {
 		return s.db.Close()
 	}
 	return nil
-}
-
-// allowPing records and enforces the per-ASN ping-request rate limit (default 10 per hour).
-func (s *MeasurementStore) allowPing(asn string) bool {
-	s.pingHistoryMu.Lock()
-	defer s.pingHistoryMu.Unlock()
-
-	now := time.Now().UTC()
-	const (
-		maxTokens  = 10.0
-		refillRate = 10.0 / 3600.0 // 10 tokens per 3600 seconds (1 hour)
-	)
-
-	lim, exists := s.pingHistory[asn]
-	if !exists {
-		// Allow request and initialize bucket with maxTokens minus this 1 request.
-		s.pingHistory[asn] = pingRate{
-			tokens: maxTokens - 1.0,
-			last:   now,
-		}
-		return true
-	}
-
-	// Refill tokens based on physical duration elapsed
-	elapsed := now.Sub(lim.last).Seconds()
-	newTokens := lim.tokens + (elapsed * refillRate)
-	if newTokens > maxTokens {
-		newTokens = maxTokens
-	}
-
-	if newTokens < 1.0 {
-		// Rate limit hit: persist the refilled state but deny access
-		lim.tokens = newTokens
-		lim.last = now
-		s.pingHistory[asn] = lim
-		return false
-	}
-
-	// Consume 1 token and save state
-	lim.tokens = newTokens - 1.0
-	lim.last = now
-	s.pingHistory[asn] = lim
-	return true
-}
-
-func (s *MeasurementStore) StartCleanupRateLimitWorker() {
-	cleanup := func() {
-		s.pingHistoryMu.Lock()
-		defer s.pingHistoryMu.Unlock()
-
-		now := time.Now().UTC()
-		for asn, lim := range s.pingHistory {
-			// If the entry has been idle for more than an hour, it's fully charged.
-			// We can safely drop it. If they request again, they start at max tokens.
-			if now.Sub(lim.last) >= time.Hour {
-				delete(s.pingHistory, asn)
-			}
-		}
-	}
-
-	t := time.NewTicker(1 * time.Hour)
-	defer t.Stop()
-	for {
-		<-t.C
-		cleanup()
-	}
 }
 
 // markSeen refreshes last_seen, last_probed and optionally the client version
@@ -280,6 +211,8 @@ func (s *MeasurementStore) agentHealthCheck() bool {
 	}
 
 	_ = rows.Close()
+
+	log.Printf("Probing %d agents\n", len(agents))
 
 	rand.Shuffle(len(agents), func(i, j int) {
 		agents[i], agents[j] = agents[j], agents[i]

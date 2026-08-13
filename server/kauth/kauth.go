@@ -76,7 +76,7 @@ func VerifyAuthToken(signature, params string, sessionTimeoutSec int) (userData 
 		return
 	}
 
-	if userData.Domain != config.Global.MyDomain && !config.Global.IsDevelopment {
+	if userData.Domain != config.Global.MyDomain {
 		err = errors.New("this request is for a different domain")
 		return
 	}

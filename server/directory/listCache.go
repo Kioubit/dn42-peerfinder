@@ -48,11 +48,6 @@ type NetworkLocation struct {
 }
 
 // ListCache is a single, shared, read-mostly snapshot of the network *index*.
-//
-// Only the lightweight index (no Servers map) is kept in memory. This bounds RAM
-// to a small multiple of the network count rather than the full dataset, while
-// keeping request-time filtering allocation-free. Full bodies are
-// fetched from disk per-ASN when actually needed
 type ListCache struct {
 	mu           sync.RWMutex
 	entries      []cachedNetwork
