@@ -58,6 +58,7 @@ const {authToken, isLoggedIn} = useAuth();
 const agentUrl = "agent/peerfinder-agent.py";
 const agentSystemdUrl = "agent/peerfinder-agent.service";
 const agentInstallUrl = "agent/install.sh";
+const agentDockerfileUrl = "agent/Dockerfile";
 
 const installCommand = computed(() =>
     `curl -fsSL ${window.location.origin}/${agentInstallUrl} | sh`
@@ -368,7 +369,10 @@ async function testAgent(a: AgentWithMetadata) {
             </div>
             <p class="text-muted small">
               Deploy <code>peerfinder-agent.py</code> on your nodes to feed live latency measurements back to this page. The agent listens on a TCP port and only accepts requests signed by the peerfinder with your secret key.
-              <span class="d-block"><a :href="agentSystemdUrl" target="_blank">Example systemd config</a></span>
+              <span class="d-flex gap-2">
+                <span class="d-block"><a :href="agentSystemdUrl" target="_blank">Systemd config</a></span>
+                <span class="d-block"><a :href="agentDockerfileUrl" target="_blank">Dockerfile</a></span>
+              </span>
             </p>
             <div class="d-grid gap-2">
               <a :href="agentUrl" download class="btn btn-outline-dark btn-sm py-2">
@@ -453,12 +457,12 @@ async function testAgent(a: AgentWithMetadata) {
                   </button>
                 </div>
 
-                <div class="smallest text-muted mb-1 mt-3">
+                <div class="smallest text-muted mb-1 mt-1">
                   Or run the one-click installer with your key pre-filled:
                 </div>
                 <div class="input-group input-group-sm">
                   <input class="form-control bg-white font-monospace" :value="installWithSecretCommand" readonly>
-                  <button class="btn btn-outline-success" type="button" @click="copyText(installWithSecretCommand, $event)">
+                  <button class="btn btn-outline-secondary" type="button" @click="copyText(installWithSecretCommand, $event)">
                     <FontAwesomeIcon :icon="faCopy" class="me-1"/>
                     <span data-copy-toggle>Copy</span>
                     <span data-copy-toggle hidden>Copied!</span>
