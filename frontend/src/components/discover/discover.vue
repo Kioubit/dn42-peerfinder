@@ -5,7 +5,7 @@ import {
   faCompass, faDownload, faServer, faPlus,
   faSpinner, faCheck, faExclamationTriangle, faCopy, faPlay,
   faClock, faBan, faTrashCan, faPenToSquare, faFloppyDisk, faXmark,
-  faCircle, faChartLine, faEyeSlash, faEye, faVial
+  faCircle, faChartLine, faEyeSlash, faEye, faVial, faTerminal
 } from "@fortawesome/free-solid-svg-icons";
 import Ping from "./ping.vue";
 import {useAuth} from "@/composables/useAuth.ts";
@@ -57,6 +57,18 @@ const {authToken, isLoggedIn} = useAuth();
 
 const agentUrl = "agent/peerfinder-agent.py";
 const agentSystemdUrl = "agent/peerfinder-agent.service";
+const agentInstallUrl = "agent/install.sh";
+
+const installCommand = computed(() =>
+    `curl -fsSL ${window.location.origin}/${agentInstallUrl} | sh`
+);
+
+const installWithSecretCommand = computed(() => {
+  const key = registeredAgent.value?.hmac_key;
+  return key
+      ? `${installCommand.value} --secret '${key}'`
+      : installCommand.value;
+});
 
 function toggleSecret(agent: AgentWithMetadata) {
   agent.showSecret = !agent.showSecret
@@ -64,7 +76,7 @@ function toggleSecret(agent: AgentWithMetadata) {
 
 const agentFormData = ref({ name: '', endpoint: '' })
 const registerLoading = ref(false)
-const registerError = ref<string| null>(null)
+const registerError = ref<string|null>(null)
 const registeredAgent = ref<RegisterAgentResponse|null>(null)
 
 function addAuthHeader(options: RequestInit = {}) {
@@ -346,11 +358,11 @@ async function testAgent(a: AgentWithMetadata) {
                   <FontAwesomeIcon :icon="faCircle" class="smallest me-1"/>
                   {{ statistics?.active ?? '—' }} Active
                 </span>
-                            <span class="badge rounded-pill bg-primary-subtle text-primary-emphasis px-3 py-2 x-small text-nowrap">
+              <span class="badge rounded-pill bg-primary-subtle text-primary-emphasis px-3 py-2 x-small text-nowrap">
                   <FontAwesomeIcon :icon="faServer" class="smallest me-1"/>
                   {{ statistics?.registered ?? '—' }} Registered
                 </span>
-                  <span  class="smallest text-muted">
+              <span  class="smallest text-muted">
                   updated {{ statistics ? timeAgoPlain(statistics?.update_time): '—' }}
                 </span>
             </div>
@@ -363,6 +375,25 @@ async function testAgent(a: AgentWithMetadata) {
                 <FontAwesomeIcon :icon="faDownload" class="text-primary me-2"/>
                 Download agent script (python)
               </a>
+            </div>
+
+            <!-- One-click installer -->
+            <div class="mt-4 p-3 rounded-3 border bg-light-subtle">
+              <div class="d-flex align-items-center mb-2">
+                <FontAwesomeIcon :icon="faTerminal" class="text-primary me-2"/>
+                <span class="fw-bold small">One-click Install</span>
+              </div>
+              <p class="smallest text-muted mb-2">
+                Run this directly on your node to download and install the agent automatically:
+              </p>
+              <div class="input-group input-group-sm mb-1">
+                <input class="form-control bg-white font-monospace" :value="installCommand" readonly>
+                <button class="btn btn-outline-primary" type="button" @click="copyText(installCommand, $event)">
+                  <FontAwesomeIcon :icon="faCopy" class="me-1"/>
+                  <span data-copy-toggle>Copy</span>
+                  <span data-copy-toggle hidden>Copied!</span>
+                </button>
+              </div>
             </div>
 
             <template v-if="isLoggedIn">
@@ -417,6 +448,18 @@ async function testAgent(a: AgentWithMetadata) {
                   <input class="form-control bg-white" :value="registeredAgent?.hmac_key" readonly>
                   <button class="btn btn-outline-secondary" @click="copyText(registeredAgent?.hmac_key, $event)">
                     <FontAwesomeIcon :icon="faCopy"/>
+                    <span data-copy-toggle>Copy</span>
+                    <span data-copy-toggle hidden>Copied!</span>
+                  </button>
+                </div>
+
+                <div class="smallest text-muted mb-1 mt-3">
+                  Or run the one-click installer with your key pre-filled:
+                </div>
+                <div class="input-group input-group-sm">
+                  <input class="form-control bg-white font-monospace" :value="installWithSecretCommand" readonly>
+                  <button class="btn btn-outline-success" type="button" @click="copyText(installWithSecretCommand, $event)">
+                    <FontAwesomeIcon :icon="faCopy" class="me-1"/>
                     <span data-copy-toggle>Copy</span>
                     <span data-copy-toggle hidden>Copied!</span>
                   </button>

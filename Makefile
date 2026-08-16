@@ -26,6 +26,7 @@ www: frontend
 	cp -r frontend/dist/* server/www/
 	cp agent/peerfinder-agent.service server/www/agent/
 	cp agent/peerfinder-agent.py server/www/agent/
+	cp agent/install.sh server/www/agent/
 
 server: www
 	$(MAKE) -C server build
