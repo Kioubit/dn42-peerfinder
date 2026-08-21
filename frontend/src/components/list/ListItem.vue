@@ -90,10 +90,10 @@ onMounted(() => {
         <div class="flex-grow-1">
           <div class="d-flex align-items-center gap-2 mb-2 flex-wrap">
             <h5 class="card-title fw-bold mb-0 text-dark">{{ item.Name }}</h5>
-            <span class="badge bg-primary-subtle text-primary border border-primary rounded-pill px-2 py-1 fw-semibold">{{ item.Mnt }}</span>
+            <span class="badge bg-primary-subtle text-primary border border-primary rounded-pill px-2 py-1 fw-semibold">{{ item.Mnt }} / {{ item.asn }}</span>
           </div>
 
-          <p class="text-muted mb-3 small">
+          <p class="text-muted mb-3 small text-break">
             {{ item.Description }}
           </p>
           <p>
