@@ -168,6 +168,7 @@ async function loadAgents() {
 }
 
 const directoryServers = ref<readonly Server[]>([]);
+const directoryServerFetchError = ref<boolean>(false);
 const unknownAgents = computed(() => {
   let cnt = 0;
   agents.value.forEach((a) => {
@@ -182,6 +183,7 @@ const unknownAgents = computed(() => {
 
 async function fetchDirectoryServers() {
   try {
+    directoryServerFetchError.value = false;
     const response = await fetch(`api/directory/self`, addAuthHeader());
     if (!response.ok) throw new Error(`Failed to load: ${response.status}`);
     const data: unknown = await response.json();
@@ -191,6 +193,7 @@ async function fetchDirectoryServers() {
 
     directoryServers.value = data.Servers ?? [];
   } catch (e) {
+    directoryServerFetchError.value = true;
     console.warn("fetchDirectoryServers", e);
   }
 }
@@ -480,7 +483,7 @@ async function testAgent(a: AgentWithMetadata) {
           <div class="card-header bg-white border-0 pt-4 pb-2 d-flex justify-content-between align-items-center">
             <h6 class="fw-bold mb-0 text-muted small text-uppercase tracking-wider">
               <FontAwesomeIcon :icon="faChartLine" class="text-primary me-2"/>
-              Contributed Nodes
+              Contributed Nodes <span v-if="!agentsLoading">({{agents.length}})</span>
             </h6>
             <button class="btn btn-link p-0 text-decoration-none small text-primary fw-semibold" @click="loadAgents" :disabled="agentsLoading">
               <FontAwesomeIcon :icon="faSpinner" :class="{'fa-spin': agentsLoading}" class="me-1"/> Reload
@@ -497,9 +500,13 @@ async function testAgent(a: AgentWithMetadata) {
             </div>
             <div v-else-if="!agents.length" class="text-center text-muted py-5 px-3 small">No nodes contributed.</div>
             <template v-else>
-              <div v-if="unknownAgents > 0" class="alert alert-danger mx-4 mt-2 mb-3 p-2 small border-0 d-flex align-items-center">
+              <div v-if="!directoryServerFetchError && unknownAgents > 0" class="alert alert-danger mx-4 mt-2 mb-3 p-2 small border-0 d-flex align-items-center">
                 <FontAwesomeIcon :icon="faExclamationTriangle" class="me-2"/>
                 {{unknownAgents}} of the registered node IDs could not be matched to entries in the directory.
+              </div>
+              <div v-else-if="directoryServerFetchError" class="alert alert-danger mx-4 mt-2 mb-3 p-2 small border-0 d-flex align-items-center">
+                <FontAwesomeIcon :icon="faExclamationTriangle" class="me-2"/>
+                Failed fetching server entries in the directory.
               </div>
               <div class="table-responsive border-bottom">
                 <table class="table align-middle mb-0">
@@ -520,7 +527,7 @@ async function testAgent(a: AgentWithMetadata) {
                                 class="badge x-small border"
                                 :class="isOutdated(a) ? 'bg-warning-subtle text-warning-emphasis' : 'bg-light text-secondary'"
                                 :title="isOutdated(a) ? `Outdated - latest is v${AGENT_VERSION}` : ''">
-                          <FontAwesomeIcon v-if="isOutdated(a)" :icon="faExclamationTriangle" class="me-1 smallest"/>
+                          <FontAwesomeIcon v-if="isOutdated(a)" :icon="faExclamationTriangle" class="smallest"/>
                           v{{ a.version }}
                         </span>
                         </div>
