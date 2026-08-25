@@ -139,7 +139,7 @@ function agentStatus(a: AgentInfo) {
   ) {
     return { text: `Active (${timeAgoPlain(a.last_seen)})`, class: "text-success bg-success-subtle" }
   } else {
-    return { text: `Inactive (${timeAgoPlain(a.last_seen)})`, class: "text-secondary bg-light" }
+    return { text: `Inactive (${timeAgoPlain(a.last_seen)})`, class: "text-danger bg-danger-subtle" }
   }
 }
 
