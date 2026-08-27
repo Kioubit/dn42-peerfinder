@@ -10,7 +10,7 @@ import GeoJSON from 'ol/format/GeoJSON'
 import {Circle as CircleStyle, Fill, RegularShape, Stroke, Style} from 'ol/style'
 import Overlay from 'ol/Overlay'
 import {fromLonLat} from 'ol/proj'
-import {XYZ} from "ol/source";
+import {OSM} from "ol/source";
 import type Geometry from "ol/geom/Geometry";
 import {Feature} from "ol";
 import type {Coordinate} from "ol/coordinate";
@@ -298,7 +298,8 @@ onMounted(async () => {
     map = new Map({
       target: mapEl.value,
       layers: [
-        /*new TileLayer({ source: new OSM() }),*/
+        new TileLayer({ source: new OSM() }),
+        /*
         new TileLayer({
           source: new XYZ({
             url: 'https://{a-c}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',
@@ -306,6 +307,7 @@ onMounted(async () => {
             wrapX: false
           }),
         }),
+         */
         new VectorLayer({ source: vectorSource }),
       ],
       overlays: [overlay],
