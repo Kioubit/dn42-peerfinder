@@ -270,8 +270,10 @@ function timeAgoPlain(date: Date | null) {
   const h = Math.floor(m / 60)
   if (h < 24) return h + 'h ago'
 
-  const d = Math.floor(h / 24)
-  return d + 'd ago'
+  if (h < 24) return h + 'h ago'
+  if (h < 48) return `${Math.floor(h/24)}d ${h%24}h ago`
+
+  return Math.round(h/24) + 'd ago'
 }
 
 function isOutdated(a: AgentInfo) {
