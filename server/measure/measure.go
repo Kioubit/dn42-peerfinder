@@ -166,7 +166,8 @@ func (s *MeasurementStore) updateAgentMeta(ctx context.Context, peer agentInfo) 
 // RunAgentHealthChecks periodically probes agents and disables any down longer than agentMaxDownDuration.
 func (s *MeasurementStore) RunAgentHealthChecks() {
 	time.Sleep(10 * time.Minute)
-	ticker := time.NewTicker(agentHealthCheckInterval)
+	// maxHealthCheckDuration is added for the cutoff to apply properly in agentHealthCheck()
+	ticker := time.NewTicker(agentHealthCheckInterval + maxHealthCheckDuration)
 	defer ticker.Stop()
 
 	for range ticker.C {
