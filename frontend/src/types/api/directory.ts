@@ -34,7 +34,7 @@ export const knownTags = [
     'automated-peering', 'semi-automated-peering', 'fast-reply', 'testing',
     'e-mail', 'irc', 'telegram', 'matrix', 'xmpp', 'signal', 'wireguard',
     'openvpn', 'gre', 'ipsec', 'tinc', 'fastd', 'stunnel', 'v4-only',
-    'v6-only', 'NAT', 'mp-bgp', 'enh', 'bfd', 'contact-required', 'dynamic-ip'
+    'v6-only', 'NAT', 'mp-bgp', 'enh', 'bfd', 'selective-peering', 'dynamic-ip'
 ] as const;
 
 export type AvailableCountriesResponse = {

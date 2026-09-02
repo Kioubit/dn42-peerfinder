@@ -58,7 +58,7 @@ var validTags = []YamlTag{
 	"mp-bgp",
 	"enh",
 	"bfd",
-	"contact-required",
+	"selective-peering",
 	"dynamic-ip",
 }
 
