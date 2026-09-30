@@ -264,7 +264,7 @@ const exploreAsn = ref('');
 
       <form class="row g-2 align-items-end" @submit.prevent="createPing">
         <div class="col-md-10">
-          <label class="form-label form-label-sm text-secondary fw-semibold small">IP Target</label>
+          <label class="form-label form-label-sm text-secondary fw-semibold small">Target IP address</label>
           <input
               type="text"
               class="form-control"
@@ -297,10 +297,10 @@ const exploreAsn = ref('');
       <div v-if="!isLoggedIn" class="rounded-3 mt-3 p-4 bg-light border border-dashed text-center">
         <div class="fw-bold mb-1 text-dark">
           <FontAwesomeIcon :icon="faUserPlus" class="text-warning me-2"/>
-          Access Restricted
+          Sign in to run a measurement
         </div>
         <p class="text-muted small mx-auto max-width-xs mb-3">
-          Global measurement requests require authentication
+          Test latency to your IP from every registered node in the network
         </p>
       </div>
 
