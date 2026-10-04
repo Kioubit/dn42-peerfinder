@@ -37,7 +37,7 @@ const agentHealthCheckInterval = 24 * time.Hour
 
 // agentMaxDownDuration is how long an agent may go without a successful response
 // before it is considered inactive.
-const agentMaxDownDuration = 30 * 24 * time.Hour
+const agentMaxDownDuration = 60 * 24 * time.Hour
 
 // maxAgentResponseBytes caps how much data is ever read back from an
 // agent connection to avoid denial of service.

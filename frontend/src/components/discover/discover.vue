@@ -637,7 +637,7 @@ async function testAgent(a: AgentWithMetadata) {
               <div class="text-muted x-small">
                 <ul class="mb-1 ps-3">
                   <li><strong>Health checks:</strong> Nodes are probed periodically. Unresponsive nodes are
-                    auto-disabled after 30 days and may later be removed.</li>
+                    auto-disabled after 60 days and may later be removed.</li>
                   <li><strong>Source IPs:</strong> Source IPs used for ping requests may change at any time.</li>
                   <li>
                     <strong>Security:</strong> The peerfinder agent is designed to be
