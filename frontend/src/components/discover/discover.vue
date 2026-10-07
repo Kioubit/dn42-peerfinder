@@ -67,7 +67,7 @@ const installCommand = computed(() =>
 const installWithSecretCommand = computed(() => {
   const key = registeredAgent.value?.hmac_key;
   return key
-      ? `${installCommand.value} --secret '${key}'`
+      ? `${installCommand.value} -s -- --secret '${key}'`
       : installCommand.value;
 });
 
@@ -331,8 +331,8 @@ async function testAgent(a: AgentWithMetadata) {
                 <FontAwesomeIcon class="text-secondary small" :icon="faCompass"/>
                 <div class="lh-sm">
                   <span class="x-small fw-semibold text-secondary">Local Discovery:</span>
-                  <span class="text-muted smallest ms-1">
-                    Ping directory nodes directly from your local machine instead using a local copy of this node directory.
+                  <span class="text-muted smallest">
+                    Ping nodes directly from your local machine instead, using a local copy of this network list.
                   </span>
                 </div>
               </div>
@@ -370,7 +370,9 @@ async function testAgent(a: AgentWithMetadata) {
                 </span>
             </div>
             <p class="text-muted small">
-              Deploy <code>peerfinder-agent.py</code> on your nodes to feed live latency measurements back to this page. The agent listens on a TCP port and only accepts requests signed by the peerfinder with your secret key.
+              Deploy <code>peerfinder-agent.py</code> on your nodes to feed live latency measurements
+              back to this page. The agent listens on a TCP port and only accepts requests signed by
+              the peerfinder with your secret key.
               <span class="d-flex gap-2">
                 <span class="d-block"><a :href="agentSystemdUrl" target="_blank">Systemd config</a></span>
                 <span class="d-block"><a :href="agentDockerfileUrl" target="_blank">Dockerfile</a></span>
@@ -490,7 +492,7 @@ async function testAgent(a: AgentWithMetadata) {
           <div class="card-body px-0 pt-0">
             <div v-if="agentsError" class="alert alert-danger mx-4 mt-2 mb-3 p-2 small border-0 d-flex align-items-center">
               <FontAwesomeIcon :icon="faExclamationTriangle" class="me-2"/>
-              <span class="me-auto">{{ agentsError }}</span>
+              <span class="me-auto">Failed fetching registered nodes: {{ agentsError }}</span>
               <button type="button" class="btn-close ms-2" style="font-size: 0.5rem" @click="agentsError = null"></button>
             </div>
             <div v-if="agentsLoading" class="text-center py-4 text-muted small">
