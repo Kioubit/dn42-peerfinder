@@ -268,9 +268,8 @@ function timeAgoPlain(date: Date | null) {
   if (m < 60) return m + 'm ago'
 
   const h = Math.floor(m / 60)
-  if (h < 24) return h + 'h ago'
+  if (h < 24) return h + 'h ago';
 
-  if (h < 24) return h + 'h ago'
   if (h < 48) return `${Math.floor(h/24)}d ${h%24}h ago`
 
   return Math.round(h/24) + 'd ago'
@@ -321,44 +320,42 @@ async function testAgent(a: AgentWithMetadata) {
 
 <template>
   <div class="dash-layout">
+    <div class="row g-4">
+      <div class="col-xl-8 col-lg-7">
+        <ping></ping>
 
-    <div class="row mb-5">
-      <div class="col-12">
-        <div class="card border-0 bg-light-subtle shadow-sm border-start border-primary border-4 py-2">
-          <div class="card-body">
-            <div class="d-md-flex justify-content-between align-items-center">
-              <div>
-                <div class="h5 fw-bold d-flex align-items-center mb-1">
-                  <FontAwesomeIcon class="text-primary me-2" :icon="faCompass"/>
-                  Local Network Node Discovery
-                </div>
-                <div class="text-muted small">
-                  Pings all peering nodes locally using a local copy of this Node directory. Easily locate new peers.
+        <div class="card border border-light-subtle bg-light-subtle rounded-3 mt-4">
+          <div class="card-body py-2 px-3">
+            <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2">
+              <div class="d-flex align-items-center gap-2">
+                <FontAwesomeIcon class="text-secondary small" :icon="faCompass"/>
+                <div class="lh-sm">
+                  <span class="x-small fw-semibold text-secondary">Local Discovery:</span>
+                  <span class="text-muted smallest ms-1">
+                    Ping directory nodes directly from your local machine instead using a local copy of this node directory.
+                  </span>
                 </div>
               </div>
-              <div class="mt-3 mt-md-0">
-                <a href="api/directory/download_script" class="btn btn-outline-primary fw-semibold btn-md shadow-xs text-nowrap">
-                  <FontAwesomeIcon :icon="faDownload" class="me-2"/> Download Script
+              <div class="text-end">
+                <a href="api/directory/download_script" class="btn btn-outline-secondary btn-xs text-nowrap">
+                  <FontAwesomeIcon :icon="faDownload" class="me-1"/> Download script
                 </a>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-
-    <div class="row g-4">
-      <div class="col-xl-8 col-lg-7">
-        <ping></ping>
-      </div>
 
       <div class="col-xl-4 col-lg-5">
-        <div class="card border-0 shadow-sm mb-4">
-          <div class="card-body p-4">
-            <h6 class="fw-bold text-uppercase tracking-wider small text-muted mb-3 d-flex align-items-center">
+        <div class="card border-light-subtle shadow-xs mb-4">
+          <div class="card-header bg-transparent border-bottom py-3 px-4">
+            <h6 class="fw-bold text-uppercase tracking-wider small text-muted mb-0 d-flex align-items-center">
               <FontAwesomeIcon :icon="faServer" class="text-primary me-2"/>
-              Live node contribution agent
+              Contribute a node
             </h6>
+          </div>
+          <div class="card-body p-4">
+
             <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
                 <span class="badge rounded-pill bg-success-subtle text-success px-3 py-2 x-small text-nowrap">
                   <FontAwesomeIcon :icon="faCircle" class="smallest me-1"/>
@@ -368,7 +365,7 @@ async function testAgent(a: AgentWithMetadata) {
                   <FontAwesomeIcon :icon="faServer" class="smallest me-1"/>
                   {{ statistics?.registered ?? '—' }} Registered
                 </span>
-              <span  class="smallest text-muted">
+              <span class="smallest text-muted">
                   updated {{ statistics ? timeAgoPlain(statistics?.update_time): '—' }}
                 </span>
             </div>
@@ -386,7 +383,6 @@ async function testAgent(a: AgentWithMetadata) {
               </a>
             </div>
 
-            <!-- One-click installer -->
             <div class="mt-4 p-3 rounded-3 border bg-light-subtle">
               <div class="d-flex align-items-center mb-2">
                 <FontAwesomeIcon :icon="faTerminal" class="text-primary me-2"/>
@@ -500,7 +496,13 @@ async function testAgent(a: AgentWithMetadata) {
             <div v-if="agentsLoading" class="text-center py-4 text-muted small">
               <FontAwesomeIcon :icon="faSpinner" class="fa-spin me-1"/>Refreshing...
             </div>
-            <div v-else-if="!agents.length" class="text-center text-muted py-5 px-3 small">No nodes contributed.</div>
+            <div v-else-if="!agents.length" class="text-center py-5 px-3">
+              <div class="bg-light rounded-circle d-inline-flex p-3 mb-2 text-muted">
+                <FontAwesomeIcon :icon="faServer" size="lg" />
+              </div>
+              <p class="small fw-semibold text-dark mb-1">No nodes added yet</p>
+              <p class="smallest text-muted mb-0">Register your first node above to start reporting latency data.</p>
+            </div>
             <template v-else>
               <div v-if="!directoryServerFetchError && unknownAgents > 0" class="alert alert-danger mx-4 mt-2 mb-3 p-2 small border-0 d-flex align-items-center">
                 <FontAwesomeIcon :icon="faExclamationTriangle" class="me-2"/>
@@ -554,7 +556,7 @@ async function testAgent(a: AgentWithMetadata) {
 
                         <div v-if="a.added_at" class="d-flex align-items-center gap-1 mt-1 text-muted x-small text-nowrap">
                           <FontAwesomeIcon :icon="faClock" class="smallest"/>
-                          added {{ timeAgoPlain(a.added_at) }}
+                          Added {{ timeAgoPlain(a.added_at) }}
                         </div>
                         <div v-if="a.testing" class="mt-2">
                           <div class="alert p-2 rounded-3 small border-0 d-flex align-items-center gap-2 bg-info-subtle text-info-emphasis">
@@ -665,7 +667,7 @@ async function testAgent(a: AgentWithMetadata) {
 
 <style scoped>
 .dash-layout {
-  padding: 0 0.75rem 4rem;
+  padding: 1.5rem 0.75rem 4rem;
   max-width: 140rem;
   margin: 0 auto;
 }
