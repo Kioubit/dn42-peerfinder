@@ -295,19 +295,25 @@ onMounted(async () => {
     const min = fromLonLat([-180, -85.06]);
     const max = fromLonLat([180, 85.06]);
 
+    const baseLayer = new TileLayer({ source: new OSM() })
+    baseLayer.on('prerender', (evt) => {
+      const ctx = evt.context
+      if (ctx instanceof CanvasRenderingContext2D) {
+        ctx.filter = 'grayscale(0.8) brightness(1.06) contrast(0.82)'
+      }
+    })
+
+    baseLayer.on('postrender', (evt) => {
+      const ctx = evt.context
+      if (ctx instanceof CanvasRenderingContext2D) {
+        ctx.filter = 'none'
+      }
+    })
+
     map = new Map({
       target: mapEl.value,
       layers: [
-        new TileLayer({ source: new OSM() }),
-        /*
-        new TileLayer({
-          source: new XYZ({
-            url: 'https://{a-c}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',
-            attributions: '© OpenStreetMap contributors © CARTO',
-            wrapX: false
-          }),
-        }),
-         */
+        baseLayer,
         new VectorLayer({ source: vectorSource }),
       ],
       overlays: [overlay],
