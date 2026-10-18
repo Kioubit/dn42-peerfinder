@@ -117,12 +117,12 @@ func (c *ListCache) rebuild() ([]cachedNetwork, []string, string) {
 
 	_ = filepath.WalkDir(config.Global.ServersDirectory, func(_ string, d fs.DirEntry, err error) error {
 		if err != nil || d.IsDir() {
-			return nil
+			return err
 		}
 		nw, modTime, err := ReadYAMLFile(config.Global.ServersDirectory, d.Name())
 		if err != nil {
 			log.Printf("Error reading %s: %v", d.Name(), err)
-			return nil
+			return err
 		}
 		// Fold filename + modTime into the ETag so it changes when data changes
 		// but stays stable across rebuilds when nothing changed.

@@ -211,31 +211,12 @@ func (s *MeasurementStore) PingStreamHandler() func(http.ResponseWriter, *http.R
 
 		log.Printf("Running ping query with ip: %s for %s\n", ip, session.ASN)
 
-		rows, err := s.db.QueryContext(ctx, `SELECT uuid, asn, id, endpoint, hmac_key, version FROM peers
-                                                  WHERE endpoint != '' AND disabled = 0`)
+		agents, err := s.activeProbeTargets(ctx)
 		if err != nil {
-			log.Println("database query error:", err)
+			log.Println("measurement: ping target query failed:", err)
 			_ = sendError("database error")
 			return
 		}
-		var agents []agentInfo
-		for rows.Next() {
-			var peer agentInfo
-			if err := rows.Scan(&peer.UUID, &peer.ASN, &peer.ID, &peer.Endpoint, &peer.HMACKey, &peer.Version); err != nil {
-				log.Println("measurement: streaming scan failed:", err)
-				_ = rows.Close()
-				_ = sendError("database error")
-				return
-			}
-			agents = append(agents, peer)
-		}
-		if rows.Err() != nil {
-			log.Println("measurement: rows iteration failed:", rows.Err())
-			_ = rows.Close()
-			_ = sendError("database error")
-			return
-		}
-		_ = rows.Close()
 
 		rand.Shuffle(len(agents), func(i, j int) {
 			agents[i], agents[j] = agents[j], agents[i]
@@ -330,7 +311,11 @@ func (s *MeasurementStore) TestAgentHandler(w http.ResponseWriter, r *http.Reque
 		http.Error(w, "uuid query parameter is required", http.StatusBadRequest)
 		return
 	}
-	row := s.db.QueryRow(`SELECT uuid, asn, id, endpoint, hmac_key, version FROM peers
+
+	ctx, cancel := context.WithTimeout(r.Context(), agentUserTestTimeout)
+	defer cancel()
+
+	row := s.db.QueryRowContext(ctx, `SELECT uuid, asn, id, endpoint, hmac_key, version FROM peers
                                          WHERE endpoint != '' AND uuid = ? AND asn = ?`, uuid, session.ASN)
 
 	var peer agentInfo
@@ -343,9 +328,6 @@ func (s *MeasurementStore) TestAgentHandler(w http.ResponseWriter, r *http.Reque
 		http.Error(w, "internal server error", http.StatusInternalServerError)
 		return
 	}
-
-	ctx, cancel := context.WithTimeout(r.Context(), agentUserTestTimeout)
-	defer cancel()
 
 	ok, err := s.updateAgentMeta(ctx, peer)
 	if err != nil {

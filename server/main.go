@@ -2,7 +2,9 @@ package main
 
 import (
 	"context"
+	cryptorand "crypto/rand"
 	"embed"
+	"encoding/base64"
 	"errors"
 	"flag"
 	"fmt"
@@ -112,15 +114,19 @@ func staticContentHandler() http.Handler {
 	html, _ := fs.Sub(fSys, "www")
 	fileServer := http.FileServer(http.FS(html))
 
+	b := make([]byte, 12)
+	_, _ = cryptorand.Read(b)
+	staticEtag := fmt.Sprintf(`"%s"`, base64.RawURLEncoding.EncodeToString(b))
+
 	withETag := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		maxAge := "86400"
 		if r.URL.Path == "/" {
 			maxAge = "900"
 		}
-		w.Header().Set("ETag", config.StaticEtag)
+		w.Header().Set("ETag", staticEtag)
 		w.Header().Set("Cache-Control", fmt.Sprintf("public, max-age=%s must-revalidate", maxAge))
 
-		if match := r.Header.Get("If-None-Match"); strings.TrimPrefix(match, "W/") == config.StaticEtag {
+		if match := r.Header.Get("If-None-Match"); strings.TrimPrefix(match, "W/") == staticEtag {
 			w.WriteHeader(http.StatusNotModified)
 			return
 		}

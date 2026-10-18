@@ -58,6 +58,12 @@ func (s *MeasurementStore) listAgents(asn string) []agentInfo {
 		}
 		out = append(out, p)
 	}
+
+	if err = rows.Err(); err != nil {
+		log.Println("measurement: ListAgents query failed:", err)
+		return []agentInfo{}
+	}
+
 	return out
 }
 

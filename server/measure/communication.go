@@ -21,16 +21,16 @@ import (
 	"time"
 )
 
-var (
-	requestMarker  = [1]byte{0x00}
-	responseMarker = [1]byte{0x01}
-)
-
 // sendAgentRequest opens a TCP connection to an agent, sends an HMAC-signed
 // request, and returns the verified JSON response. The agent's shared
 // secret (HMACKey) authenticates both directions.
 // Returned: (Unmarshalled JSON payload, success boolean)
 func sendAgentRequest(ctx context.Context, peer agentInfo, payload map[string]any) (map[string]any, bool) {
+	var (
+		requestMarker  = [1]byte{0x00}
+		responseMarker = [1]byte{0x01}
+	)
+
 	if peer.Endpoint == "" || peer.HMACKey == "" {
 		return nil, false
 	}

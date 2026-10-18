@@ -8,9 +8,9 @@
 #   build     - Default target for running locally & debug
 #   release   - Build a static release binary via server/Makefile
 #   clean     - Remove all build artifacts
-#   clean-all - Remove all build artifacts and generated files
+#   distclean - Remove all build artifacts and generated files
 
-.PHONY: frontend www server data-dir build release clean clean-all
+.PHONY: frontend www server data-dir build release clean distclean
 
 build: server data-dir
 
@@ -42,6 +42,6 @@ clean:
 	rm -rf data/access.lock
 	rm -rf data/archive.zip
 
-clean-all: clean
-	$(MAKE) -C server clean-all
+distclean: clean
+	$(MAKE) -C server distclean
 	rm -rf data/measurements/
