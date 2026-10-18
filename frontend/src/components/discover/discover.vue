@@ -332,7 +332,7 @@ async function testAgent(a: AgentWithMetadata) {
                 <div class="lh-sm">
                   <span class="x-small fw-semibold text-secondary">Local Discovery:</span>
                   <span class="text-muted smallest">
-                    Ping nodes directly from your local machine instead, using a local copy of this network list.
+                    Alternatively, ping nodes directly from your machine using a local copy of the network list.
                   </span>
                 </div>
               </div>
@@ -348,11 +348,9 @@ async function testAgent(a: AgentWithMetadata) {
 
       <div class="col-xl-4 col-lg-5">
         <div class="card border-light-subtle shadow-xs mb-4">
-          <div class="card-header bg-transparent border-bottom py-3 px-4">
-            <h6 class="fw-bold text-uppercase tracking-wider small text-muted mb-0 d-flex align-items-center">
-              <FontAwesomeIcon :icon="faServer" class="text-primary me-2"/>
-              Contribute a node
-            </h6>
+          <div class="card-header bg-transparent border-bottom py-3 px-4 d-flex align-items-center gap-2">
+            <FontAwesomeIcon :icon="faServer" class="text-primary" />
+            <h6 class="fw-bold text-uppercase text-body-secondary small mb-0">Provide latency data</h6>
           </div>
           <div class="card-body p-4">
 
@@ -405,7 +403,7 @@ async function testAgent(a: AgentWithMetadata) {
 
             <template v-if="isLoggedIn">
               <div class="border-top my-4 pt-4">
-                <h6 class="fw-bold small text-muted mb-2 text-uppercase tracking-wider">Register Node</h6>
+                <h6 class="fw-bold small text-body-secondary text-uppercase mb-1">Register Node</h6>
                 <p class="smallest text-muted mb-2">The agent listens on a TCP port. Enter the host and port reachable by the peerfinder.</p>
                 <div v-if="registerError" class="alert alert-danger mb-3 p-2 small border-0 d-flex align-items-center rounded-3">
                   <FontAwesomeIcon :icon="faExclamationTriangle" class="me-2"/>
@@ -413,7 +411,7 @@ async function testAgent(a: AgentWithMetadata) {
                 </div>
                 <form @submit.prevent="registerAgent">
                   <div class="mb-2">
-                    <label class="smallest fw-bold text-secondary mb-1">Node ID (Must match the node ID in the directory)</label>
+                    <label class="smallest fw-bold text-secondary mb-1">Node ID (Must match the node ID in the network list)</label>
                     <input type="text"
                            class="form-control form-control-sm"
                            v-model="agentFormData.name"
@@ -446,9 +444,9 @@ async function testAgent(a: AgentWithMetadata) {
                   <FontAwesomeIcon :icon="faCheck" class="me-2 text-success"/>
                   <span class="fw-semibold">Node Registered!</span>
                 </div>
-                <div class="smallest text-muted mb-2">
+                <div class="mb-2">
                   Run <code>peerfinder-agent.py</code> on your node. It must be reachable at <code>{{ registeredAgent.endpoint }}</code>.
-                  Make sure to set the environment variable with your secret key.
+                  Make sure to configure your secret key.
                 </div>
                 <div class="input-group input-group-sm mb-2">
                   <span class="input-group-text bg-white border">Secret key</span>
@@ -460,7 +458,7 @@ async function testAgent(a: AgentWithMetadata) {
                   </button>
                 </div>
 
-                <div class="smallest text-muted mb-1 mt-1">
+                <div class="mb-1 mt-1">
                   Or run the one-click installer with your key pre-filled:
                 </div>
                 <div class="input-group input-group-sm">
@@ -480,13 +478,13 @@ async function testAgent(a: AgentWithMetadata) {
         </div>
 
         <div v-if="isLoggedIn" class="card border-0 shadow-sm">
-          <div class="card-header bg-white border-0 pt-4 pb-2 d-flex justify-content-between align-items-center">
-            <h6 class="fw-bold mb-0 text-muted small text-uppercase tracking-wider">
-              <FontAwesomeIcon :icon="faChartLine" class="text-primary me-2"/>
-              Contributed Nodes <span v-if="!agentsLoading">({{agents.length}})</span>
+          <div class="card-header bg-transparent border-bottom py-3 px-4 d-flex justify-content-between align-items-center">
+            <h6 class="fw-bold mb-0 text-body-secondary small text-uppercase d-flex align-items-center gap-2">
+              <FontAwesomeIcon :icon="faChartLine" class="text-primary" />
+              Contributed Nodes <span v-if="!agentsLoading">({{ agents.length }})</span>
             </h6>
-            <button class="btn btn-link p-0 text-decoration-none small text-primary fw-semibold" @click="loadAgents" :disabled="agentsLoading">
-              <FontAwesomeIcon :icon="faSpinner" :class="{'fa-spin': agentsLoading}" class="me-1"/> Reload
+            <button class="btn btn-link btn-sm p-0 text-decoration-none fw-semibold" @click="loadAgents" :disabled="agentsLoading">
+              <FontAwesomeIcon :icon="faSpinner" :class="{'fa-spin': agentsLoading}" class="me-1" /> Reload
             </button>
           </div>
           <div class="card-body px-0 pt-0">
@@ -514,23 +512,23 @@ async function testAgent(a: AgentWithMetadata) {
                 <FontAwesomeIcon :icon="faExclamationTriangle" class="me-2"/>
                 Failed fetching server entries in the directory.
               </div>
-              <div class="table-responsive border-bottom">
+              <div class="table-responsive">
                 <table class="table align-middle mb-0">
-                  <thead>
-                  <tr class="border-light">
-                    <th class="ps-4 py-2 text-uppercase x-small text-muted fw-semibold">Agent</th>
-                    <th class="py-2 text-uppercase x-small text-muted fw-semibold">Status</th>
-                    <th class="pe-4 py-2 text-end text-uppercase x-small text-muted fw-semibold">Actions</th>
-                  </tr>
+                  <thead class="table-light small text-body-secondary">
+                    <tr>
+                      <th class="ps-4 py-2">Agent</th>
+                      <th class="py-2">Status</th>
+                      <th class="pe-4 py-2 text-end">Actions</th>
+                    </tr>
                   </thead>
                   <tbody>
-                  <tr v-for="a in agents" :key="a.uuid" class="border-light hover-bg">
+                  <tr v-for="a in agents" :key="a.uuid">
                     <td class="ps-4 py-3">
                       <div v-if="!a.editing">
                         <div class="d-flex align-items-center gap-2">
                           <strong class="text-dark small">{{ a.id }}</strong>
                           <span v-if="a.version"
-                                class="badge x-small border"
+                                class="badge border"
                                 :class="isOutdated(a) ? 'bg-warning-subtle text-warning-emphasis' : 'bg-light text-secondary'"
                                 :title="isOutdated(a) ? `Outdated - latest is v${AGENT_VERSION}` : ''">
                           <FontAwesomeIcon v-if="isOutdated(a)" :icon="faExclamationTriangle" class="smallest"/>
@@ -538,17 +536,15 @@ async function testAgent(a: AgentWithMetadata) {
                         </span>
                         </div>
 
-                        <div class="d-flex align-items-center gap-1 mt-1">
-                          <FontAwesomeIcon :icon="a.showSecret ? faEye : faEyeSlash"
-                                           class="smallest text-muted" role="button"
-                                           @click="toggleSecret(a)"/>
-                          <code v-if="a.showSecret"
-                                class="x-small text-primary text-break user-select-all">
-                            {{ a.hmac_key }}
-                          </code>
-                          <code v-else
-                                class="x-small text-muted" role="button"
-                                @click="toggleSecret(a)">click to reveal secret key</code>
+                        <div class="d-flex align-items-center gap-1 mt-1 small">
+                          <FontAwesomeIcon
+                              :icon="a.showSecret ? faEye : faEyeSlash"
+                              class="text-secondary smallest"
+                              role="button"
+                              @click="toggleSecret(a)"
+                          />
+                          <code v-if="a.showSecret" class="text-primary text-break user-select-all">{{ a.hmac_key }}</code>
+                          <code v-else class="text-body-secondary" role="button" @click="toggleSecret(a)">reveal secret key</code>
                         </div>
 
                         <div v-if="a.endpoint" class="d-flex align-items-center gap-1 mt-1 text-muted x-small text-nowrap">
@@ -576,6 +572,7 @@ async function testAgent(a: AgentWithMetadata) {
                         </div>
                       </div>
 
+                      <!-- Edit Mode -->
                       <div v-else class="py-1">
                         <div class="mb-2">
                           <label class="smallest text-muted fw-bold d-block mb-1">Node ID</label>
@@ -606,29 +603,28 @@ async function testAgent(a: AgentWithMetadata) {
                     </span>
                     </td>
 
+                    <!-- Action buttons -->
                     <td class="text-end pe-4 text-nowrap">
                       <template v-if="!a.editing">
-                        <div class="btn-group btn-group-xs shadow-xs rounded border">
-                          <button class="btn btn-white btn-sm" title="Edit" @click="startEdit(a)"><FontAwesomeIcon :icon="faPenToSquare"/></button>
-                          <button class="btn btn-white btn-sm text-info" title="Test agent" @click="testAgent(a)" :disabled="a.testing">
-                            <FontAwesomeIcon :icon="a.testing ? faSpinner : faVial" :class="{'fa-spin': a.testing}"/>
+                        <div class="btn-group btn-group-sm border rounded">
+                          <button class="btn btn-light" title="Edit" @click="startEdit(a)">
+                            <FontAwesomeIcon :icon="faPenToSquare" />
                           </button>
-                          <button class="btn btn-white btn-sm"
-                                  :class="a.disabled ? 'text-success' : 'text-warning'"
-                                  :title="a.disabled ? 'Re-enable node' : 'Disable node'"
-                                  @click="toggleDisable(a)"
-                                  :disabled="a.saving">
-                            <FontAwesomeIcon :icon="a.saving ? faSpinner : (a.disabled ? faPlay : faBan)" :class="{'fa-spin': a.saving}"/>
+                          <button class="btn btn-light text-info" title="Test agent" @click="testAgent(a)" :disabled="a.testing">
+                            <FontAwesomeIcon :icon="a.testing ? faSpinner : faVial" :class="{'fa-spin': a.testing}" />
                           </button>
-                          <button class="btn btn-white btn-sm text-danger" title="Delete" @click="deleteAgent(a)"><FontAwesomeIcon :icon="faTrashCan"/></button>
-                        </div>
-                      </template>
-                      <template v-else>
-                        <div class="btn-group btn-group-xs">
-                          <button class="btn btn-success btn-xs text-white" title="Save" @click="saveEdit(a)" :disabled="a.saving">
-                            <FontAwesomeIcon :icon="a.saving ? faSpinner : faFloppyDisk" :class="{'fa-spin': a.saving}"/>
+                          <button
+                              class="btn btn-light"
+                              :class="a.disabled ? 'text-success' : 'text-warning'"
+                              :title="a.disabled ? 'Re-enable' : 'Disable'"
+                              @click="toggleDisable(a)"
+                              :disabled="a.saving"
+                          >
+                            <FontAwesomeIcon :icon="a.saving ? faSpinner : (a.disabled ? faPlay : faBan)" :class="{'fa-spin': a.saving}" />
                           </button>
-                          <button class="btn btn-outline-secondary btn-xs" title="Cancel" @click="cancelEdit(a)" :disabled="a.saving"><FontAwesomeIcon :icon="faXmark"/></button>
+                          <button class="btn btn-light text-danger" title="Delete" @click="deleteAgent(a)">
+                            <FontAwesomeIcon :icon="faTrashCan" />
+                          </button>
                         </div>
                       </template>
                     </td>
@@ -669,18 +665,12 @@ async function testAgent(a: AgentWithMetadata) {
 
 <style scoped>
 .dash-layout {
-  padding: 1.5rem 0.75rem 4rem;
+  padding: 0.5rem 0.75rem 4rem;
   max-width: 140rem;
   margin: 0 auto;
 }
-.small-header th { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.05em; }
-.tracking-wider { letter-spacing: 0.06em; }
 .smallest { font-size: 0.7rem; }
 .x-small { font-size: 0.75rem; }
 .btn-xs { padding: 0.15rem 0.4rem; font-size: 0.75rem; }
-.btn-group-xs > .btn { padding: 0.2rem 0.4rem; font-size: 0.75rem; }
-.btn-white { background: #ffffff; border: none; }
-.btn-white:hover { background: #f8f9fa; }
-.hover-bg:hover { background-color: #fafbfc; }
 .border-dashed { border-style: dashed !important; }
 </style>

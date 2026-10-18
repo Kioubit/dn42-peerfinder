@@ -267,7 +267,7 @@ const allServersMissingLocode = computed(() => {
 
 <template>
   <template v-if="isLoggedIn">
-    <div class="card border-0 overflow-hidden mx-auto" style="max-width: 110rem;">
+    <div class="card border-0 overflow-hidden mx-auto mb-4" style="max-width: 110rem;">
       <div class="card-header bg-white border-0 pt-1 px-4 pb-0">
         <div class="d-flex align-items-center mb-2">
           <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
@@ -360,7 +360,7 @@ const allServersMissingLocode = computed(() => {
                 </button>
               </div>
               <small v-if="form.Tags.length > 0" class="text-muted d-block mt-1">
-                <FontAwesomeIcon :icon="faInfoCircle" class="me-1" />Drag selected tags above to set their order.
+                Drag selected tags above to set their order.
               </small>
             </div>
             <div v-if="noNetworkTagsButServerTags" class="col-12">
@@ -390,8 +390,12 @@ const allServersMissingLocode = computed(() => {
 
             <p class="text-muted small mb-3">
               <FontAwesomeIcon :icon="faInfoCircle" class="me-1" />
-              Server tags are <b>not used for network filtering</b>. For properties you would like to be searchable, use <b>network tags</b>.
+              <a href="#/discover">Register</a> your nodes to <b>provide latency data</b>.<br>
+              <FontAwesomeIcon :icon="faInfoCircle" class="me-1" />Server tags are
+              <b>not used for network filtering</b>. For properties you would like to be searchable,
+              use <b>network tags</b>.
             </p>
+
 
             <div v-if="allServersMissingLocode" class="alert alert-warning d-flex align-items-center rounded-3 border-0 mb-3">
               <FontAwesomeIcon :icon="faExclamationTriangle" class="me-2" />
@@ -566,8 +570,8 @@ const allServersMissingLocode = computed(() => {
   </template>
   <template v-else>
     <div class="text-center">
-      <FontAwesomeIcon :icon="faUserPlus" size="3x" class="text-warning mb-3" />
-      <h3 class="fw-semibold mb-0">Access Restricted</h3>
+      <FontAwesomeIcon :icon="faUserPlus" size="3x" class="text-warning mb-2" />
+      <h3 class="fw-semibold mb-0">Sign in to continue</h3>
       <p class="text-secondary mb-0">Authentication is required to add or edit your network information</p>
     </div>
   </template>
