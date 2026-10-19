@@ -90,11 +90,11 @@ func (c *ListCache) GetListHandler(w http.ResponseWriter, r *http.Request) {
 		if len(tags) > 0 && !hasAllTags(e.net.Tags, tags) {
 			continue
 		}
-		// Country filter matches networks that have at least one server in the requested country
-		if country != "" {
+
+		if city != "" && country != "" {
 			found := false
-			for _, location := range e.locations {
-				if location.Country == country {
+			for _, loc := range e.locations {
+				if loc.City == city && loc.Country == country {
 					found = true
 					break
 				}
@@ -102,13 +102,11 @@ func (c *ListCache) GetListHandler(w http.ResponseWriter, r *http.Request) {
 			if !found {
 				continue
 			}
-		}
-
-		if city != "" && country != "" {
+		} else if country != "" {
+			// Country filter matches networks that have at least one server in the requested country
 			found := false
-			for _, loc := range e.locations {
-				// loc.Country == country is checked above
-				if loc.City == city {
+			for _, location := range e.locations {
+				if location.Country == country {
 					found = true
 					break
 				}
