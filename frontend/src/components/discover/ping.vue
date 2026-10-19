@@ -269,7 +269,7 @@ const exploreAsn = ref('');
               type="text"
               class="form-control"
               v-model="pingIp"
-              placeholder="e.g. 100.20.0.1 or 2001:678:d78::1"
+              placeholder="e.g. 203.0.113.10 or 2001:db8:d78::1"
               :disabled="pingLoading || pingActive || !isLoggedIn"
               required
           >
