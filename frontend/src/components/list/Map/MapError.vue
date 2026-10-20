@@ -13,7 +13,7 @@ defineProps<Props>()
     <div class="d-flex flex-column justify-content-center align-items-center bg-light" style="height: 420px;">
       <div class="alert alert-warning border-0 shadow-sm mx-4">
         <h6 class="alert-heading fw-bold">Failed to load component</h6>
-        <p class="mb-0 small">{{ error.message || 'The connection timed out or the server is unreachable.' }}</p>
+        <p class="mb-0 small">{{ error.message }}</p>
       </div>
     </div>
   </div>

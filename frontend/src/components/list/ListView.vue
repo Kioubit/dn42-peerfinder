@@ -30,7 +30,7 @@ const AsyncServerMap = defineAsyncComponent({
   loadingComponent: MapLoading,
   errorComponent: MapError,
   delay: 200,
-  timeout: 5000
+  timeout: 8000
 })
 
 const items = shallowRef<ListResponseNetwork[]>([]);

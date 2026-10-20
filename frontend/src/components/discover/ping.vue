@@ -252,9 +252,9 @@ const exploreAsn = ref('');
 
 <template>
   <NetworkDialog :asn="exploreAsn" @close="exploreAsn = ''"></NetworkDialog>
-  <div class="card border-0 shadow-sm rounded-3 mb-4 card-glow">
+  <div class="card border-0 shadow-sm rounded-3 mb-4">
     <div class="card-body p-4 position-relative">
-      <h5 class="fw-bold mb-1 card-heading d-flex align-items-center">
+      <h5 class="fw-bold mb-1 d-flex align-items-center">
         <FontAwesomeIcon :icon="faSatelliteDish" class="text-primary me-2"/>
         Global Latency Measurement
       </h5>

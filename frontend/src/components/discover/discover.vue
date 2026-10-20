@@ -329,8 +329,8 @@ async function testAgent(a: AgentWithMetadata) {
             <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2">
               <div class="d-flex align-items-center gap-2">
                 <FontAwesomeIcon class="text-secondary small" :icon="faCompass"/>
-                <div class="lh-sm">
-                  <span class="x-small fw-semibold text-secondary">Local Discovery:</span>
+                <div class="lh-sm x-small">
+                  <span class="fw-semibold text-secondary">Local Discovery:</span>
                   <span class="text-muted smallest">
                     Alternatively, ping nodes directly from your machine using a local copy of the network list.
                   </span>
