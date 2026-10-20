@@ -67,7 +67,11 @@ const pageNumbers = computed(() => {
 const searchQuery = ref("");
 const availableCountries = ref<string[]>([]);
 const selectedCountry = ref<string>('');
-const selectedCity = ref('');
+const selectedCityRaw = ref('')
+const selectedCity = computed({
+  get: () => selectedCityRaw.value,
+  set: v => selectedCityRaw.value = v.toUpperCase()
+})
 const selectedTags = ref<string[]>([]);
 
 // Guards against out-of-order responses: only the newest request may commit
@@ -88,7 +92,7 @@ const fetchList = async () => {
     if (searchQuery.value) params.set('q', searchQuery.value);
     if (selectedTags.value.length) params.set('tags', selectedTags.value.join(','));
     if (selectedCountry.value) params.set('country', selectedCountry.value);
-    if (selectedCity.value) params.set('city', selectedCity.value.toUpperCase());
+    if (selectedCity.value) params.set('city', selectedCity.value);
 
     const response = await fetch(`api/directory/list?${params.toString()}`, {
       signal: controller.signal
@@ -362,7 +366,7 @@ fetchCountries();
             v-if="selectedCity"
             class="badge bg-info-subtle text-info border border-info d-inline-flex align-items-center gap-1"
         >
-          City: {{ selectedCity.toUpperCase() }}
+          City: {{ selectedCity }}
         </span>
 
         <!-- Clear button -->
@@ -436,7 +440,7 @@ fetchCountries();
           :key="item.Mnt + '/' + item.Name"
           class="col-12 animate-up"
       >
-        <ListItem :item="item" />
+        <ListItem :item="item" :selectedCountry="selectedCountry" :selectedCity="selectedCity" />
       </div>
 
       <!-- Empty State -->

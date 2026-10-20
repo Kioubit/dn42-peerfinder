@@ -15,6 +15,8 @@ const flagIcons = flagIconsRaw as Record<string, string>
 
 interface Props {
   item: ListResponseNetwork
+  selectedCountry?: string
+  selectedCity?: string
   autoExpand?: boolean
 }
 const props = defineProps<Props>()
@@ -78,6 +80,14 @@ onMounted(() => {
     }
   }
 })
+
+const matchesFilter = (server: Server) => {
+  const country = (props.selectedCountry ?? '').trim()
+  const city = (props.selectedCity ?? '').trim()
+  if (!country && !city) return false
+  if (country && server.CountryCode !== country) return false
+  return !(city && server.City !== city);
+}
 </script>
 
 <template>
@@ -177,6 +187,7 @@ onMounted(() => {
               <tr
                   v-for="server in servers"
                   :key="server.ID"
+                  :class="{ 'table-warning': matchesFilter(server) }"
               >
                 <td class="fw-semibold">{{ server.ID }}</td>
                 <td>
